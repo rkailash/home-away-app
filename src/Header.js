@@ -20,7 +20,7 @@ class Header extends Component {
     const {showLogin} = this.props;
     return (
       <div className="header">
-        <span className="logo">Homeaway</span>
+        <img className="logo" src="https://csvcus.homeaway.com/rsrcs/cdn-logos/2.11.0/bce/moniker/homeaway_us/logo-bceheader-white.svg" />
         {showLogin &&
           <Select onChange={(e) => this.onClickLogin(e)} styles={menuStyles} placeholder={'Login'} options={options} />
         }

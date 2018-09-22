@@ -38,7 +38,7 @@ class Search extends Component {
         children: 0,
         pets: false
       },
-      location: ''
+      location: ""
     };
   }
   componentDidMount() {
@@ -83,7 +83,7 @@ class Search extends Component {
       focusedInput,
       modalIsOpen
     } = this.state;
-    console.log(startDate);
+    console.log(guests.pets);
     return (
       <div className="search">
         <input ref={this.input} onChange={this.onChange} />
@@ -110,6 +110,7 @@ class Search extends Component {
           style={customStyles}
           shouldCloseOnOverlayClick
           contentLabel="Example Modal"
+          overlayClassName="hidden"
         >
           <p>Adults:</p>
           <Counter
@@ -122,7 +123,21 @@ class Search extends Component {
             onIncrement={i => this.updateChildrenGuests(i)}
           />
           <p>Pets:</p>
-          {/* <RadioGroup checked options onChange={()} */}
+          <RadioGroup
+            options={[
+              { label: "Yes", value: "yes" },
+              { label: "No", value: "no" }
+            ]}
+            checked={guests.pets ? "yes" : "no"}
+            onChange={i =>
+              this.setState({
+                guests: {
+                  ...guests,
+                  pets: i === "yes" ? true : false
+                }
+              })
+            }
+          />
         </Modal>
         <button type="button" className="submit">
           Search

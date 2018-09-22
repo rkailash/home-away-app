@@ -1,7 +1,17 @@
+@import 'constants.scss';
+
 .header {
   display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: transparent;
+  z-index: 99999;
+  height: $header-height;
   .logo {
-    flex: 0 1 50%;
+    flex: none;
+    width: auto;
   }
   .menu {
     flex: none;

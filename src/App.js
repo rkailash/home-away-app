@@ -4,6 +4,7 @@ import {Route, Redirect} from 'react-router-dom';
 import Header from './Header';
 import Home from './Home';
 import Login from './Login';
+import Owner from './Owner';
 import 'styles/app.scss';
 
 const routes = [
@@ -27,10 +28,11 @@ class App extends Component {
     }
     return (
       <div>
-        <Header showLogin onClick={(route) => this.setActiveRoute(route)} />
-        <div>
-          <Route path="/" component={Home} />
-          <Route path="/login" component={Login} />
+        {/* <Header showLogin onClick={(route) => this.setActiveRoute(route)} /> */}
+        <div className="body-container">
+          {/* <Route path="/" component={Home} />
+          <Route path="/login" component={Login} /> */}
+          <Route path="/" component={Owner} />
         </div>
       </div>
     );

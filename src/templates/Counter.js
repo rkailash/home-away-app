@@ -18,7 +18,7 @@ class Counter extends Component {
       this.setState({ currentValue: this.props.min });
   };
   incrementBy = i => {
-    const { min, onIncrement } = this.props;
+    const { min } = this.props;
     const currentValue =
       this.state.currentValue + i < min ? min : this.state.currentValue + i;
     this.setState({ currentValue });
