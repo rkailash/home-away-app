@@ -1,0 +1,9 @@
+.header {
+  display: flex;
+  .logo {
+    flex: 0 1 50%;
+  }
+  .menu {
+    flex: none;
+  }
+}
