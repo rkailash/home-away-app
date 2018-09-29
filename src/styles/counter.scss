@@ -11,9 +11,10 @@
     -moz-appearance:textfield;
     color: $black;
     height: 58px;
-    width: 72px;
-    border-top: 1px solid $gray;
-    border-bottom: 1px solid $gray;
+    width: 58px;
+    margin: 0 16px;
+    border: 1px solid $gray;
+    border-radius: 50%;
     line-height: 58px;
     text-align: center;
   }
@@ -29,6 +30,7 @@
     font-size: 20px;
     background: white;
     border: 1px solid $gray;
+    border-radius: 50%;
     color: $gray;
     cursor: pointer;
     &:hover {
