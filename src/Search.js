@@ -7,29 +7,17 @@ import {
 import Select from "react-select";
 import Counter from "templates/Counter";
 import RadioGroup from "templates/RadioGroup";
-import Modal from "react-modal";
+import Dropdown from "templates/Dropdown";
 import "react-dates/initialize";
 import "react-dates/lib/css/_datepicker.css";
 import "styles/search.scss";
-
-const customStyles = {
-  content: {
-    // top: "50%",
-    // left: "50%",
-    right: "auto",
-    bottom: "auto"
-    // marginRight: "-50%",
-    // transform: "translate(-50%, -50%)"
-  }
-};
 
 class Search extends Component {
   constructor(props) {
     super(props);
     this.input = createRef();
-    this.mapAttribution = createRef();
     this.state = {
-      modalIsOpen: false,
+      dropdownIsOpen: false,
       service: null,
       startDate: null,
       endDate: null,
@@ -38,21 +26,29 @@ class Search extends Component {
         children: 0,
         pets: false
       },
-      location: ""
+      location: null
     };
   }
   componentDidMount() {
     this.setState({
-      service: new google.maps.places.PlacesService(this.mapAttribution.current)
+      service: new google.maps.places.Autocomplete(this.input.current, {
+        options: {
+          types: ["(cities)"]
+        }
+      })
     });
   }
+  displaySuggestions = (predictions, status) => {
+    if (status != google.maps.places.PlacesServiceStatus.OK) {
+      alert(status);
+      return;
+    }
+    console.log(predictions);
+  };
   onChange = () => {
-    const request = {
-      query: this.input.current.value
-    };
-    const { service } = this.state;
-    service.findPlaceFromQuery(request, function(response) {
-      console.log(response);
+    this.state.service.addListener("place_changed", () => {
+      const location = this.state.service.getPlace().place_id;
+      this.setState({ location });
     });
   };
   updateAdultGuests = i => {
@@ -69,76 +65,71 @@ class Search extends Component {
     };
     this.setState({ guests });
   };
-  openModal = () => {
-    this.setState({ modalIsOpen: true });
-  };
-  closeModal = () => {
-    this.setState({ modalIsOpen: false });
-  };
+  openDropdown = () => this.setState({ dropdownIsOpen: !this.state.dropdownIsOpen });
   render() {
-    const {
-      guests,
-      startDate,
-      endDate,
-      focusedInput,
-      modalIsOpen
-    } = this.state;
-    console.log(guests.pets);
+    const { guests, startDate, endDate, focusedInput, dropdownIsOpen } = this.state;
     return (
       <div className="search">
-        <input ref={this.input} onChange={this.onChange} />
-        <label ref={this.mapAttribution} />
+        <input
+          className="location-search"
+          ref={this.input}
+          placeholder="Where do you want to go?"
+          onChange={() => this.onChange()}
+        />
+        <div className="v-line" />
         <DateRangePicker
           startDate={startDate} // momentPropTypes.momentObj or null,
           startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
           endDate={endDate} // momentPropTypes.momentObj or null,
           endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
+          startDatePlaceholderText="Arrive"
+          endDatePlaceholderText="Depart"
           onDatesChange={({ startDate, endDate }) =>
             this.setState({ startDate, endDate })
           } // PropTypes.func.isRequired,
           focusedInput={focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
           onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
         />
-        <button type="button" onClick={this.openModal}>{`${guests.adults +
-          guests.children} Guest${
-          guests.adults + guests.children > 1 ? "s" : ""
-        } ${guests.pets ? ", Pets" : ""}`}</button>
-        <Modal
-          isOpen={modalIsOpen}
-          onAfterOpen={this.afterOpenModal}
-          onRequestClose={this.closeModal}
-          style={customStyles}
-          shouldCloseOnOverlayClick
-          contentLabel="Example Modal"
-          overlayClassName="hidden"
-        >
-          <p>Adults:</p>
-          <Counter
-            min={guests.adults}
-            onIncrement={i => this.updateAdultGuests(i)}
-          />
-          <p>Children:</p>
-          <Counter
-            min={guests.children}
-            onIncrement={i => this.updateChildrenGuests(i)}
-          />
-          <p>Pets:</p>
-          <RadioGroup
-            options={[
-              { label: "Yes", value: "yes" },
-              { label: "No", value: "no" }
-            ]}
-            checked={guests.pets ? "yes" : "no"}
-            onChange={i =>
-              this.setState({
-                guests: {
-                  ...guests,
-                  pets: i === "yes" ? true : false
+        <div className="v-line" />
+        <div className="dropdown-group">
+          <button
+            type="button"
+            className="guest-selector"
+            onClick={this.openDropdown}
+          >{`${guests.adults + guests.children} Guest${
+            guests.adults + guests.children > 1 ? "s" : ""
+          } ${guests.pets ? ", Pets" : ""}`}</button>
+          <Dropdown isOpen={dropdownIsOpen} onClick={() => this.openDropdown()}>
+              <p>Adults:</p>
+              <Counter min={1} onIncrement={i => this.updateAdultGuests(i)} />
+              <p>Children:</p>
+              <Counter
+                min={0}
+                onIncrement={i => this.updateChildrenGuests(i)}
+              />
+              <p>Pets:</p>
+              <RadioGroup
+                options={[
+                  { label: "Yes", value: "yes" },
+                  { label: "No", value: "no" }
+                ]}
+                checked={guests.pets ? "yes" : "no"}
+                onChange={i =>
+                  this.setState({
+                    guests: {
+                      ...guests,
+                      pets: i === "yes" ? true : false
+                    }
+                  })
                 }
-              })
-            }
-          />
-        </Modal>
+              />
+              <div className="button-group">
+                <button type="button" className="apply-guests">
+                  Apply
+                </button>
+              </div>
+            </Dropdown>
+        </div>
         <button type="button" className="submit">
           Search
         </button>
