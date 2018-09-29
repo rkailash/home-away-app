@@ -7,6 +7,22 @@ var cors = require("cors");
 app.set("view engine", "ejs");
 var mysql = require("mysql");
 var pool = require("./pool");
+const multer = require("multer");
+const uuidv4 = require("uuid/v4");
+const path = require("path");
+const fs = require("fs");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./uploads");
+  },
+  filename: (req, file, cb) => {
+    const newFilename = `test${path.extname(file.originalname)}`;
+    cb(null, newFilename);
+  }
+});
+
+const upload = multer({ storage });
 
 //use cors to allow cross origin resource sharing
 //app.use(cors({ origin: "http://localhost:3000", credentials: true }));
@@ -28,14 +44,20 @@ app.use(
 app.use(bodyParser.json());
 
 //Allow Access Control
-/*app.use(function(req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
-    res.setHeader('Cache-Control', 'no-cache');
-    next();
-  });*/
+app.use(function(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,HEAD,OPTIONS,POST,PUT,DELETE"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
+  );
+  res.setHeader("Cache-Control", "no-cache");
+  next();
+});
 
 app.get("/home", function(req, res) {
   var sql = "SELECT * FROM property";
@@ -61,6 +83,18 @@ app.get("/home", function(req, res) {
       });
     }
   });
+});
+
+app.post("/", upload.single("selectedFile"), (req, res) => {
+  if (!req.file) {
+    console.log("No file received");
+    res.send({
+      success: false
+    });
+  } else {
+    console.log("File received!", res.file);
+    res.send();
+  }
 });
 
 //start your server on port 3001
