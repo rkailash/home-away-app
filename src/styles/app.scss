@@ -48,10 +48,26 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
-
+* {
+	font-family: $font;
+}
 button {
 	margin: 0;
 	padding: 0;
 	border: 0;
 	outline: 0;
+	cursor: pointer;
+}
+.ReactModal__Content {
+	p {
+		margin: 1rem 0!important;
+	}
+}
+.rounded-box {
+	border-radius: 50%;
+}
+.main-btn {
+	color: $offwhite;
+	background: $blue;
+	border-radius: 40px;
 }
