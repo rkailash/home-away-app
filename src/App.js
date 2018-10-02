@@ -13,30 +13,16 @@ import "styles/app.scss";
 import Register from "./Register";
 import PropertyDetails from "./PropertyDetails";
 
-const routes = [{ id: "traveler_login", route: Login }];
-
 class App extends Component {
-  /*constructor(props) {
-    super(props);
-    this.state = {
-      activeRoute: ""
-    };
-  }
-  setActiveRoute = activeRoute => {
-    this.setState({ activeRoute });
-  };*/
   render() {
-    //const { activeRoute } = this.state;
     return (
       <div>
-        {/* <Header showLogin onClick={(route) => this.setActiveRoute(route)} design="gradient" /> */}
         <div className="body-container">
-          {/* <Route path="/" component={ProductPage} /> */}
-          <Route path="/" component={Home} />
-          {/* <Route path="/Owner" component={OwnerLogin} />
+          <Route path="/" component={Login} />
+          <Route path="/Owner" component={OwnerLogin} />
           <Route path="/Home" component={Home} />
           <Route path="/Register" component={Register} /> */}
-          {/* <Route path="/owner" component={Owner} /> */}
+          <Route path="/owner" component={Owner} />
         </div>
       </div>
     );

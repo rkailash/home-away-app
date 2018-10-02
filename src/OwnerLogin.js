@@ -28,7 +28,6 @@ class OwnerLogin extends Component {
                 ref={this.emailRef}
                 type="email"
                 name="email"
-                placeholder="Email address"
               />
               <input
                 tabIndex={2}
