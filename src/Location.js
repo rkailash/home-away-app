@@ -1,4 +1,4 @@
-import React, {createRef} from "react";
+import React, { createRef } from "react";
 
 class Location extends React.Component {
   constructor(props) {
@@ -24,6 +24,16 @@ class Location extends React.Component {
       this.setState({ location });
     });
   };
+
+  handleSubmit = e => {
+    e.preventDefault();
+    const data = {
+      location: this.state.location
+      
+    };
+    axios.post("http://localhost:3001/Owner", data).then(response => {
+      console.log("Axios POST response:", response.status);
+  };
   render() {
     return (
       <div>
@@ -46,7 +56,15 @@ class Location extends React.Component {
 
             <div className="form-group">
               <label>City</label>
-              <input id="city" type="text" className="form-control" placeholder="" autoComplete="off" ref={this.input} onChange={() => this.onChange()}/>
+              <input
+                id="city"
+                type="text"
+                className="form-control"
+                placeholder=""
+                autoComplete="off"
+                ref={this.input}
+                onChange={() => this.onChange()}
+              />
             </div>
 
             <div className="form-group">
