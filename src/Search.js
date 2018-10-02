@@ -65,9 +65,22 @@ class Search extends Component {
     };
     this.setState({ guests });
   };
-  openDropdown = () => this.setState({ dropdownIsOpen: !this.state.dropdownIsOpen });
+  openDropdown = () =>
+    this.setState({ dropdownIsOpen: !this.state.dropdownIsOpen });
+  onClickSearch = () => {
+    const { location } = this.state;
+    this.props.onClick({
+      location
+    });
+  };
   render() {
-    const { guests, startDate, endDate, focusedInput, dropdownIsOpen } = this.state;
+    const {
+      guests,
+      startDate,
+      endDate,
+      focusedInput,
+      dropdownIsOpen
+    } = this.state;
     return (
       <div className="search">
         <input
@@ -100,42 +113,43 @@ class Search extends Component {
             guests.adults + guests.children > 1 ? "s" : ""
           } ${guests.pets ? ", Pets" : ""}`}</button>
           <Dropdown isOpen={dropdownIsOpen} onClick={() => this.openDropdown()}>
-              <p>Adults:</p>
-              <Counter min={1} onIncrement={i => this.updateAdultGuests(i)} />
-              <p>Children:</p>
-              <Counter
-                min={0}
-                onIncrement={i => this.updateChildrenGuests(i)}
-              />
-              <p>Pets:</p>
-              <RadioGroup
-                options={[
-                  { label: "Yes", value: "yes" },
-                  { label: "No", value: "no" }
-                ]}
-                checked={guests.pets ? "yes" : "no"}
-                onChange={i =>
-                  this.setState({
-                    guests: {
-                      ...guests,
-                      pets: i === "yes" ? true : false
-                    }
-                  })
-                }
-              />
-              <div className="button-group">
-                <button type="button" className="apply-guests">
-                  Apply
-                </button>
-              </div>
-            </Dropdown>
+            <p>Adults:</p>
+            <Counter min={1} onIncrement={i => this.updateAdultGuests(i)} />
+            <p>Children:</p>
+            <Counter min={0} onIncrement={i => this.updateChildrenGuests(i)} />
+            <p>Pets:</p>
+            <RadioGroup
+              options={[
+                { label: "Yes", value: "yes" },
+                { label: "No", value: "no" }
+              ]}
+              checked={guests.pets ? "yes" : "no"}
+              onChange={i =>
+                this.setState({
+                  guests: {
+                    ...guests,
+                    pets: i === "yes" ? true : false
+                  }
+                })
+              }
+            />
+            <div className="button-group">
+              <button type="button" className="apply-guests">
+                Apply
+              </button>
+            </div>
+          </Dropdown>
         </div>
-        <button type="button" className="submit">
+        <button type="button" className="submit" onClick={this.onClickSearch}>
           Search
         </button>
       </div>
     );
   }
 }
+
+Search.defaultProps = {
+  onClick: () => {}
+};
 
 export default Search;
