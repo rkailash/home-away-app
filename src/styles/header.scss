@@ -22,9 +22,13 @@
     justify-content: center;
     padding: 0 16px;
   }
-  .logo-image {
+  .right-container {
     flex: none;
-    float: right;
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+  }
+  .logo-image {
     margin: 0 22px;
   }
   .lyp {
@@ -39,11 +43,13 @@
     margin-left: 22px;
   }
   .header-menu {
-    flex: none;
     height: 100%;
     display: flex;
     justify-content: center;
-    margin-left: auto;
+    color: $black;
+    button, button:focus {
+      color: inherit;
+    }
     .btn-secondary:focus, .btn-secondary.focus {
       box-shadow: none;
     }
@@ -59,6 +65,12 @@
     button {
       background: transparent;
       border: 0;
+    }
+  }
+  &.gradient .header-menu {
+    color: #fff;
+    button, button:focus {
+      color: inherit;
     }
   }
 }

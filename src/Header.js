@@ -8,25 +8,6 @@ import {
 } from "reactstrap";
 import "styles/header.scss";
 
-// const options = [
-//   {value: 'traveler', label: 'Traveler Login'},
-//   {value: 'owner', label: 'Owner Login'},
-// ];
-
-// const menuStyles = {
-//   control: styles => ({
-//     ...styles,
-//     width: '100px',
-//     backgroundColor: 'transparent',
-//     height: '100%',
-//     border: 0
-//   }),
-//   container: styles => ({ ...styles, width: '200px'}),
-//   placeholder: styles => ({...styles, color: 'white', fontFamily: 'inherit'}),
-//   dropdownIndicator: styles => ({...styles, color: 'white'}),
-//   indicatorSeparator: styles => ({...styles, display: 'none'})
-// };
-
 class Header extends Component {
   constructor(props) {
     super(props);
@@ -55,6 +36,7 @@ class Header extends Component {
             }
           />
         </Link>
+        <div className="right-container">
         {showLogin && (
           <Dropdown
             className="header-menu"
@@ -85,6 +67,7 @@ class Header extends Component {
           alt="logo"
           title="logo"
         />
+        </div>
       </div>
     );
   }
