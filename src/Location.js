@@ -1,6 +1,29 @@
-import React from "react";
+import React, {createRef} from "react";
 
 class Location extends React.Component {
+  constructor(props) {
+    super(props);
+    this.input = createRef();
+    this.state = {
+      service: null,
+      location: null
+    };
+  }
+  componentDidMount() {
+    this.setState({
+      service: new google.maps.places.Autocomplete(this.input.current, {
+        options: {
+          types: ["(cities)"]
+        }
+      })
+    });
+  }
+  onChange = () => {
+    this.state.service.addListener("place_changed", () => {
+      const location = this.state.service.getPlace().place_id;
+      this.setState({ location });
+    });
+  };
   render() {
     return (
       <div>
@@ -23,7 +46,7 @@ class Location extends React.Component {
 
             <div className="form-group">
               <label>City</label>
-              <input id="city" type="text" className="form-control" />
+              <input id="city" type="text" className="form-control" placeholder="" autoComplete="off" ref={this.input} onChange={() => this.onChange()}/>
             </div>
 
             <div className="form-group">

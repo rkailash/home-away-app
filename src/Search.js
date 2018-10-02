@@ -43,7 +43,6 @@ class Search extends Component {
       alert(status);
       return;
     }
-    console.log(predictions);
   };
   onChange = () => {
     this.state.service.addListener("place_changed", () => {
