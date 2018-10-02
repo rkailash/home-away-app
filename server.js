@@ -104,8 +104,7 @@ app.post("/OwnerLogin", (req, res) => {
     "SELECT * FROM users WHERE Email = " +
     mysql.escape(email) +
     "AND Password = " +
-    mysql.escape(password) +
-    "AND Type = 'Owner'";
+    mysql.escape(password);
   pool.getConnection((err, con) => {
     if (err) {
       console.log("Could not connect to database!");
@@ -139,14 +138,48 @@ app.post("/OwnerLogin", (req, res) => {
     }
   });
 });
-
 app.post("/Register", (req, res) => {
   console.log("Inside Register POST request");
-
-  let firstName = req.body.firstName;
-  let lastName = req.body.lastName;
   let email = req.body.email;
   let password = req.body.password;
+  let firstName = req.body.firstName;
+  let lastName = req.body.lastName;
+  let sql =
+    "INSERT INTO users (`User_ID`,`LastName`, `FirstName`, `Email`, `Password`, `Type`) VALUES (NULL," +
+    mysql.escape(lastName) +
+    "," +
+    mysql.escape(firstName) +
+    "," +
+    mysql.escape(email) +
+    "," +
+    mysql.escape(password) +
+    ",'Traveller')";
+  pool.getConnection((err, con) => {
+    if (err) {
+      console.log("Could not connect to database!");
+      res.writeHead(400, {
+        "Content-Type": "text/plain"
+      });
+      res.end("Could not get connection object!");
+    } else {
+      console.log("Connection to database successful");
+      con.query(sql, (err, result) => {
+        if (err) {
+          console.log("Unable to create user", err);
+          res.writeHead(400, {
+            "Content-Type": "text/plain"
+          });
+          res.end("Unable to create user");
+        } else {
+          console.log("User creation successful");
+          res.writeHead(200, {
+            "Content-Type": "text/plain"
+          });
+          res.end("User created successfuly");
+        }
+      });
+    }
+  });
 });
 
 /*app.get("/home", function(req, res) {

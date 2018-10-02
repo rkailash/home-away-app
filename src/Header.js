@@ -37,36 +37,36 @@ class Header extends Component {
           />
         </Link>
         <div className="right-container">
-        {showLogin && (
-          <Dropdown
-            className="header-menu"
-            isOpen={this.state.dropdownOpen}
-            toggle={() => this.toggle()}
-          >
-            <DropdownToggle caret>Login</DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem>
-                <Link to="/auth/traveler">Traveler Login</Link>
-              </DropdownItem>
-              <DropdownItem>
-                <Link to="/auth/owner">Owner Login</Link>
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        )}
-        <button type="button" className="lyp">
-          List your Property
-        </button>
-        <img
-          className="logo-image"
-          src={
-            design === "gradient"
-              ? "https://csvcus.homeaway.com/rsrcs/cdn-logos/2.11.0/bce/moniker/homeaway_us/birdhouse-bceheader-white.svg"
-              : "https://csvcus.homeaway.com/rsrcs/cdn-logos/2.10.6/bce/moniker/homeaway_us/birdhouse-bceheader.svg"
-          }
-          alt="logo"
-          title="logo"
-        />
+          {showLogin && (
+            <Dropdown
+              className="header-menu"
+              isOpen={this.state.dropdownOpen}
+              toggle={() => this.toggle()}
+            >
+              <DropdownToggle caret>Login</DropdownToggle>
+              <DropdownMenu>
+                <DropdownItem>
+                  <Link to="/TravelerLogin">Traveler Login</Link>
+                </DropdownItem>
+                <DropdownItem>
+                  <Link to="/OwnerLogin">Owner Login</Link>
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          )}
+          <button type="button" className="lyp">
+            List your Property
+          </button>
+          <img
+            className="logo-image"
+            src={
+              design === "gradient"
+                ? "https://csvcus.homeaway.com/rsrcs/cdn-logos/2.11.0/bce/moniker/homeaway_us/birdhouse-bceheader-white.svg"
+                : "https://csvcus.homeaway.com/rsrcs/cdn-logos/2.10.6/bce/moniker/homeaway_us/birdhouse-bceheader.svg"
+            }
+            alt="logo"
+            title="logo"
+          />
         </div>
       </div>
     );

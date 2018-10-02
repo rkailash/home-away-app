@@ -1,16 +1,48 @@
 import React, { createRef, Component } from "react";
 import Header from "./Header";
+import axios from "axios";
 import "styles/ownerLogin.scss";
 
 class OwnerLogin extends Component {
-  constructor(props) {
-    super(props);
-    this.emailRef = createRef();
-    this.pswRef = createRef();
-  }
-  onSubmit = () => {};
+  state = {
+    account: { email: "", password: "" },
+    authFlag: false,
+    signUpFlag: false
+  };
+
+  handleChange = e => {
+    const account = { ...this.state.account };
+    account[e.currentTarget.name] = e.currentTarget.value;
+    this.setState({ account });
+  };
+
+  handleSubmit = e => {
+    e.preventDefault();
+
+    console.log("Inside handlesubmit method");
+
+    const data = { ...this.state.account };
+
+    axios.defaults.withCredentials = true;
+
+    axios.post("http://localhost:3001/OwnerLogin", data).then(response => {
+      console.log("Axios POST response:", response.status);
+
+      if (response.status === 200) {
+        console.log("Login successful");
+        this.setState({ authFlag: true });
+      } else {
+        console.log("Login unsuccessful!");
+        this.setState({ authFlag: false });
+      }
+    });
+  };
+
+  handleSignUp = e => {
+    e.preventDefault();
+    this.setState({ signUpFlag: true });
+  };
   render() {
-    const { title } = this.props;
     return (
       <div className="owner-login">
         <Header />
@@ -25,23 +57,24 @@ class OwnerLogin extends Component {
               <input
                 autoFocus
                 tabIndex={1}
-                ref={this.emailRef}
                 type="email"
                 name="email"
+                placeholder="Email address"
+                onChange={this.handleChange}
               />
               <input
                 tabIndex={2}
-                ref={this.pswRef}
                 type="password"
                 name="psw"
                 placeholder="Password"
+                onChange={this.handleChange}
               />
               <button
                 tabIndex={3}
                 type="button"
                 className="btn-login"
                 name="login"
-                onClick={this.onSubmit}
+                onClick={this.handleSubmit}
               >
                 Log in
               </button>

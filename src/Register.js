@@ -1,5 +1,6 @@
 import React, { createRef, Component } from "react";
 import Header from "./Header";
+import axios from "axios";
 import "styles/login.scss";
 
 class Register extends Component {
@@ -21,12 +22,12 @@ class Register extends Component {
 
     axios.defaults.withCredentials = true;
 
-    axios.post("http://localhost:3001/TravelLogin", data).then(response => {
+    axios.post("http://localhost:3001/Register", data).then(response => {
       console.log("Axios POST response:", response.status);
       if (response.status === 200) {
-        console.log("New user created");
+        console.log(response);
       } else {
-        console.log("User creation failed");
+        console.log(response);
       }
     });
   };
