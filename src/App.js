@@ -32,10 +32,10 @@ class App extends Component {
         {/* <Header showLogin onClick={(route) => this.setActiveRoute(route)} design="gradient" /> */}
         <div className="body-container">
           {/* <Route path="/" component={ProductPage} /> */}
-          <Route path="/" component={Login} />
-          <Route path="/Owner" component={OwnerLogin} />
+          <Route path="/" component={Home} />
+          {/* <Route path="/Owner" component={OwnerLogin} />
           <Route path="/Home" component={Home} />
-          <Route path="/Register" component={Register} />
+          <Route path="/Register" component={Register} /> */}
           {/* <Route path="/owner" component={Owner} /> */}
         </div>
       </div>
