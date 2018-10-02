@@ -1,16 +1,17 @@
-var express = require("express");
-var app = express();
-var bodyParser = require("body-parser");
-var session = require("express-session");
-var cookieParser = require("cookie-parser");
-var cors = require("cors");
-app.set("view engine", "ejs");
-var mysql = require("mysql");
-var pool = require("./pool");
+const express = require("express");
+const app = express();
+const bodyParser = require("body-parser");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const pool = require("./pool");
 const multer = require("multer");
 const uuidv4 = require("uuid/v4");
 const path = require("path");
+const mysql = require("mysql");
 const fs = require("fs");
+
+app.set("view engine", "ejs");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -24,10 +25,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-//use cors to allow cross origin resource sharing
-//app.use(cors({ origin: "http://localhost:3000", credentials: true }));
-
-//use express session to maintain session data
 app.use(
   session({
     secret: "cmpe273_kafka_passport_mongo",
@@ -38,9 +35,6 @@ app.use(
   })
 );
 
-// app.use(bodyParser.urlencoded({
-//     extended: true
-//   }));
 app.use(bodyParser.json());
 
 //Allow Access Control
@@ -59,7 +53,94 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get("/home", function(req, res) {
+app.post("/TravelLogin", (req, res) => {
+  console.log("Inside Traveller login POST request");
+  let email = req.body.email;
+  let password = req.body.password;
+  let sql =
+    "SELECT * FROM users WHERE email = " +
+    mysql.escape(email) +
+    "AND password = " +
+    mysql.escape(password);
+  pool.getConnection((err, con) => {
+    if (err) {
+      console.log("Could not connect to database!");
+      res.writeHead(400, {
+        "Content-Type": "text/plain"
+      });
+      res.end("Could not get connection object!");
+    } else {
+      console.log("Connection to database successful");
+      con.query(sql, (err, result) => {
+        if (err) {
+          console.log("Invalid credentials");
+          res.writeHead(400, {
+            "Content-Type": "text/plain"
+          });
+          res.end("Invalid Credentials");
+        } else {
+          console.log("Login successful");
+          res.cookie("travel_cookie", "admin", {
+            maxAge: 900000,
+            httpOnly: false,
+            path: "/"
+          });
+          req.session.user = result;
+          res.writeHead(200, {
+            "Content-Type": "text/plain"
+          });
+          res.end("Login successful");
+        }
+      });
+    }
+  });
+});
+
+app.post("/OwnerLogin", (req, res) => {
+  console.log("Inside Owner login POST request");
+  let email = req.body.email;
+  let password = req.body.password;
+  let sql =
+    "SELECT * FROM users WHERE email = " +
+    mysql.escape(email) +
+    "AND password = " +
+    mysql.escape(password) +
+    "AND type = 'owner'";
+  pool.getConnection((err, con) => {
+    if (err) {
+      console.log("Could not connect to database!");
+      res.writeHead(400, {
+        "Content-Type": "text/plain"
+      });
+      res.end("Could not get connection object!");
+    } else {
+      console.log("Connection to database successful");
+      con.query(sql, (err, result) => {
+        if (err) {
+          console.log("Invalid credentials");
+          res.writeHead(400, {
+            "Content-Type": "text/plain"
+          });
+          res.end("Invalid Credentials");
+        } else {
+          console.log("Login successful");
+          res.cookie("owner_cookie", "admin", {
+            maxAge: 900000,
+            httpOnly: false,
+            path: "/"
+          });
+          req.session.user = result;
+          res.writeHead(200, {
+            "Content-Type": "text/plain"
+          });
+          res.end("Login successful");
+        }
+      });
+    }
+  });
+});
+
+/*app.get("/home", function(req, res) {
   var sql = "SELECT * FROM property";
   pool.getConnection(function(err, con) {
     if (err) {
@@ -95,7 +176,7 @@ app.post("/", upload.single("selectedFile"), (req, res) => {
     console.log("File received!", res.file);
     res.send();
   }
-});
+});*/
 
 //start your server on port 3001
 app.listen(3001);

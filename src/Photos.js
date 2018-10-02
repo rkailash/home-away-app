@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Dropzone from "react-dropzone";
 import request from "superagent";
-import "styles/photos.scss";
 import axios from "axios";
 
 class Photos extends React.Component {

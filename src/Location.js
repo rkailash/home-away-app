@@ -1,7 +1,5 @@
 import React from "react";
 
-import "styles/location.scss";
-
 class Location extends React.Component {
   render() {
     return (
