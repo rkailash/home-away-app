@@ -58,9 +58,9 @@ app.post("/TravelLogin", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   let sql =
-    "SELECT * FROM users WHERE email = " +
+    "SELECT * FROM users WHERE Email = " +
     mysql.escape(email) +
-    "AND password = " +
+    "AND Password = " +
     mysql.escape(password);
   pool.getConnection((err, con) => {
     if (err) {
@@ -101,11 +101,11 @@ app.post("/OwnerLogin", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   let sql =
-    "SELECT * FROM users WHERE email = " +
+    "SELECT * FROM users WHERE Email = " +
     mysql.escape(email) +
-    "AND password = " +
+    "AND Password = " +
     mysql.escape(password) +
-    "AND type = 'owner'";
+    "AND Type = 'Owner'";
   pool.getConnection((err, con) => {
     if (err) {
       console.log("Could not connect to database!");
@@ -138,6 +138,15 @@ app.post("/OwnerLogin", (req, res) => {
       });
     }
   });
+});
+
+app.post("/Register", (req, res) => {
+  console.log("Inside Register POST request");
+
+  let firstName = req.body.firstName;
+  let lastName = req.body.lastName;
+  let email = req.body.email;
+  let password = req.body.password;
 });
 
 /*app.get("/home", function(req, res) {
