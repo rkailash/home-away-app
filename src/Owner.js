@@ -16,23 +16,42 @@ const navList = [
 ]
 
 class Owner extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeNav: 'location'
+    };
+  }
+  renderActiveNav = () => {
+    switch(this.state.activeNav) {
+      case 'location':
+        return <Location />;
+      case 'details':
+        return <Details />;
+      case 'bookingoptions':
+        return <BookingOptions />;
+      case 'photos':
+        return <Photos />;
+      case 'pricing':
+        return <Pricing />;
+      default:
+        return null;
+    }
+  }
   render() {
+    const {activeNav} = this.state;
     return (
       <div className="owner-container">
         <div className="form-box">
           <ul className="nav-list">
             {
               navList.map((item, key) => (
-                <li key={key}><Link to={`/${item.value}`}>{item.label}</Link></li>
+                <li key={key} className={item.value === activeNav ? 'active': ''} onClick={() => this.setState({activeNav: item.value})}>{item.label}</li>
               ))
             }
           </ul>
           <div className="form">
-            <Route path="/location" component={Location} />
-            <Route path="/pricing" component={Pricing} />
-            <Route path="/photos" component={Photos} />
-            <Route path="/bookingoptions" component={BookingOptions} />
-            <Route path="/details" component={Details} />
+            {this.renderActiveNav()}
           </div>
         </div>
       </div>
