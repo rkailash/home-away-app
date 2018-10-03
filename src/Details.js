@@ -1,6 +1,25 @@
-import React from "react";
+import React, {createRef} from "react";
 
 class Details extends React.Component {
+  constructor(props) {
+    super(props);
+    this.headline = createRef();
+    this.desc = createRef();
+    this.type = createRef();
+    this.bedrooms = createRef();
+    this.bathrooms = createRef();
+    this.accomodates = createRef();
+  }
+  componentWillUnmount() {
+    this.props.onChange({
+      headline: this.headline.current.value,
+      description: this.desc.current.value,
+      type: this.type.current.value,
+      bedrooms: this.bedrooms.current.value,
+      bathrooms: this.bathrooms.current.value,
+      accomodates: this.accomodates.current.value
+    });
+  }
   render() {
     return (
       <div className="panel panel-default">
@@ -10,34 +29,32 @@ class Details extends React.Component {
           <form className="details-form">
             <div className="form-group">
               <label>Headline</label>
-              <input id="headline" type="text" className="form-control" />
+              <input ref={this.headline} id="headline" type="text" className="form-control" />
             </div>
             <div className="form-group">
               <label>Property description</label>
-              <input id="pdescription" type="text" className="form-control" />
+              <input ref={this.desc} id="pdescription" type="text" className="form-control" />
             </div>
             <div className="form-group">
               <label>Property type</label>
-              <input id="ptype" type="text" className="form-control" />
+              <input ref={this.type} id="ptype" type="text" className="form-control" />
             </div>
 
             <div className="form-group">
               <label>Bedrooms</label>
-              <input id="bedrooms" type="text" className="form-control" />
+              <input ref={this.bedrooms} id="bedrooms" type="text" className="form-control" />
             </div>
 
             <div className="form-group">
               <label>Accomodates</label>
-              <input id="accomodates" type="text" className="form-control" />
+              <input ref={this.accomodates} id="accomodates" type="text" className="form-control" />
             </div>
 
             <div className="form-group">
               <label>Bathrooms</label>
-              <input id="bathrooms" type="text" className="form-control" />
+              <input ref={this.bathrooms} id="bathrooms" type="text" className="form-control" />
             </div>
             <hr />
-            <button className="btn btn-primary">Cancel</button>
-            <button className="btn btn-primary">Save</button>
           </form>
         </div>
       </div>

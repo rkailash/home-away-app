@@ -24,7 +24,9 @@ class Location extends React.Component {
       this.setState({ location });
     });
   };
-
+  componentWillUnmount() {
+    this.props.onChange(this.state.location)
+  }
   handleSubmit = e => {
     e.preventDefault();
     const data = {

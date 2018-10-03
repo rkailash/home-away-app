@@ -1,6 +1,10 @@
-import React from "react";
+import React, {createRef} from "react";
 
 class Pricing extends React.Component {
+  constructor(props) {
+    super(props);
+    this.price = createRef();
+  }
   render() {
     return (
       <div className="pricing">
@@ -8,13 +12,13 @@ class Pricing extends React.Component {
         <form className="location-form">
           <div className="form-group">
             <label>Price</label>
-            <input id="price" type="text" className="form-control" />
+            <input ref={this.price} onChange={() => this.props.onChange(this.price.current.value)} id="price" type="text" className="form-control" />
           </div>
           <button
             type="button"
             className="btn-primary"
             name="submit"
-            onClick={this.handleSubmit}
+            onClick={this.props.handleSubmit}
           >
             Log in
           </button>
