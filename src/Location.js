@@ -29,10 +29,10 @@ class Location extends React.Component {
     e.preventDefault();
     const data = {
       location: this.state.location
-      
     };
     axios.post("http://localhost:3001/Owner", data).then(response => {
       console.log("Axios POST response:", response.status);
+    });
   };
   render() {
     return (

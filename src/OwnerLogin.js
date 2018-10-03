@@ -43,47 +43,52 @@ class OwnerLogin extends Component {
     this.setState({ signUpFlag: true });
   };
   render() {
-    return (
-      <div className="owner-login">
-        <Header />
-        <div className="container">
-          <img
-            className="banner"
-            src="https://csvcus.homeaway.com/rsrcs/stab-cms-resources/0.10.35/images/cas/login-banner-sept16-1.png"
-          />
-          <div className="login-container">
-            <form>
-              <h3>Owner Login</h3>
-              <input
-                autoFocus
-                tabIndex={1}
-                type="email"
-                name="email"
-                placeholder="Email address"
-                onChange={this.handleChange}
-              />
-              <input
-                tabIndex={2}
-                type="password"
-                name="psw"
-                placeholder="Password"
-                onChange={this.handleChange}
-              />
-              <button
-                tabIndex={3}
-                type="button"
-                className="btn-login"
-                name="login"
-                onClick={this.handleSubmit}
-              >
-                Log in
-              </button>
-            </form>
+    const { account } = this.state;
+    if (this.state.signUpFlag === true) return <Redirect to="/Register" />;
+    if (this.state.authFlag === true && cookie.load("owner_cookie")) {
+      return <Redirect to="/Owner" />;
+    } else {
+      return (
+        <div className="owner-login">
+          <Header />
+          <div className="container">
+            <img
+              className="banner"
+              src="https://csvcus.homeaway.com/rsrcs/stab-cms-resources/0.10.35/images/cas/login-banner-sept16-1.png"
+            />
+            <div className="login-container">
+              <form>
+                <h3>Owner Login</h3>
+                <input
+                  autoFocus
+                  tabIndex={1}
+                  type="email"
+                  name="email"
+                  placeholder="Email address"
+                  onChange={this.handleChange}
+                />
+                <input
+                  tabIndex={2}
+                  type="password"
+                  name="psw"
+                  placeholder="Password"
+                  onChange={this.handleChange}
+                />
+                <button
+                  tabIndex={3}
+                  type="button"
+                  className="btn-login"
+                  name="login"
+                  onClick={this.handleSubmit}
+                >
+                  Log in
+                </button>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 }
-
 export default OwnerLogin;
