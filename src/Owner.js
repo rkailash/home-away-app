@@ -17,23 +17,29 @@ class Owner extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeNav: "location"
+      activeNav: "location",
+      details: undefined,
+      location: undefined,
+      price: undefined
     };
   }
   renderActiveNav = () => {
     switch (this.state.activeNav) {
       case "location":
-        return <Location />;
+        return <Location onChange={(location) => this.setState({...this.state, location})} />;
       case "details":
-        return <Details />;
+        return <Details onChange={(details) => this.setState({...this.state, details})} />;
       case "photos":
         return <Photos />;
       case "pricing":
-        return <Pricing />;
+        return <Pricing onSubmit={() => this.handleSubmit()} onChange={(price) => this.setState({price})} />;
       default:
         return null;
     }
   };
+  handleSubmit = () => {
+
+  }
   render() {
     const { activeNav } = this.state;
     return (

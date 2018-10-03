@@ -18,7 +18,7 @@ class App extends Component {
     return (
       <div>
         <div className="body-container">
-          <Route path="/" component={Login} />
+          <Route path="/" component={Owner} />
           <Route path="/TravellerLogin" component={Login} />
           <Route path="/OwnerLogin" component={OwnerLogin} />
           <Route path="/Home" component={Home} />
