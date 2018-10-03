@@ -85,7 +85,7 @@ app.post("/TravelLogin", (req, res) => {
             httpOnly: false,
             path: "/"
           });
-          req.session.user = result;
+          req.session.userid = result[0].User_ID;
           res.writeHead(200, {
             "Content-Type": "text/plain"
           });
@@ -129,6 +129,7 @@ app.post("/OwnerLogin", (req, res) => {
             path: "/"
           });
           req.session.user = result;
+          console.log(result);
           res.writeHead(200, {
             "Content-Type": "text/plain"
           });
@@ -180,6 +181,11 @@ app.post("/Register", (req, res) => {
       });
     }
   });
+});
+
+app.post("/Owner/Location", (req, res) => {
+  console.log("Inside Owner POST request");
+  console.log(req.session.userid);
 });
 
 /*app.get("/home", function(req, res) {

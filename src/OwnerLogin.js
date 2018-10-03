@@ -1,4 +1,6 @@
-import React, { createRef, Component } from "react";
+import React, { Component } from "react";
+import { Redirect, Link } from "react-router-dom";
+import cookie from "react-cookies";
 import Header from "./Header";
 import axios from "axios";
 import "styles/ownerLogin.scss";
@@ -31,6 +33,7 @@ class OwnerLogin extends Component {
       if (response.status === 200) {
         console.log("Login successful");
         this.setState({ authFlag: true });
+        console.log(response);
       } else {
         console.log("Login unsuccessful!");
         this.setState({ authFlag: false });
