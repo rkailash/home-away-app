@@ -18,10 +18,10 @@ class App extends Component {
     return (
       <div>
         <div className="body-container">
-          <Route path="/" component={Login} />
+          <Route path="/" component={Home} />
           <Route path="/TravellerLogin" component={Login} />
           <Route path="/OwnerLogin" component={OwnerLogin} />
-          <Route path="/Home" component={Home} />
+          {/* <Route path="/Home" component={Home} /> */}
           <Route path="/Register" component={Register} /> */}
           <Route path="/Owner" component={Owner} />
         </div>

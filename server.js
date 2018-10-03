@@ -53,8 +53,8 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.post("/TravelLogin", (req, res) => {
-  console.log("Inside Traveller login POST request");
+app.post("/Login", (req, res) => {
+  console.log("Inside Login POST request");
   let email = req.body.email;
   let password = req.body.password;
   let sql =
@@ -80,12 +80,16 @@ app.post("/TravelLogin", (req, res) => {
           res.end("Invalid Credentials");
         } else {
           console.log("Login successful");
-          res.cookie("travel_cookie", "admin", {
+          res.cookie("user_cookie", "admin", {
             maxAge: 900000,
             httpOnly: false,
             path: "/"
           });
+          console.log(result);
           req.session.userid = result[0].User_ID;
+          req.session.type = result[0].Type;
+          console.log(req.session.userid);
+          console.log(req.session.type);
           res.writeHead(200, {
             "Content-Type": "text/plain"
           });
@@ -96,49 +100,6 @@ app.post("/TravelLogin", (req, res) => {
   });
 });
 
-app.post("/OwnerLogin", (req, res) => {
-  console.log("Inside Owner login POST request");
-  let email = req.body.email;
-  let password = req.body.password;
-  let sql =
-    "SELECT * FROM users WHERE Email = " +
-    mysql.escape(email) +
-    "AND Password = " +
-    mysql.escape(password);
-  pool.getConnection((err, con) => {
-    if (err) {
-      console.log("Could not connect to database!");
-      res.writeHead(400, {
-        "Content-Type": "text/plain"
-      });
-      res.end("Could not get connection object!");
-    } else {
-      console.log("Connection to database successful");
-      con.query(sql, (err, result) => {
-        if (err) {
-          console.log("Invalid credentials");
-          res.writeHead(400, {
-            "Content-Type": "text/plain"
-          });
-          res.end("Invalid Credentials");
-        } else {
-          console.log("Login successful");
-          res.cookie("owner_cookie", "admin", {
-            maxAge: 900000,
-            httpOnly: false,
-            path: "/"
-          });
-          req.session.user = result;
-          console.log(result);
-          res.writeHead(200, {
-            "Content-Type": "text/plain"
-          });
-          res.end("Login successful");
-        }
-      });
-    }
-  });
-});
 app.post("/Register", (req, res) => {
   console.log("Inside Register POST request");
   let email = req.body.email;
@@ -183,7 +144,7 @@ app.post("/Register", (req, res) => {
   });
 });
 
-app.post("/Owner/Location", (req, res) => {
+app.post("/Owner", (req, res) => {
   console.log("Inside Owner POST request");
   console.log(req.session.userid);
 });

@@ -46,7 +46,7 @@ class Header extends Component {
               <DropdownToggle caret>Login</DropdownToggle>
               <DropdownMenu>
                 <DropdownItem>
-                  <Link to="/TravelerLogin">Traveler Login</Link>
+                  <Link to="/TravellerLogin">Traveler Login</Link>
                 </DropdownItem>
                 <DropdownItem>
                   <Link to="/OwnerLogin">Owner Login</Link>

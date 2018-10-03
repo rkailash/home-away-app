@@ -24,10 +24,11 @@ class Login extends Component {
     console.log("Inside handlesubmit method");
 
     const data = { ...this.state.account };
+    console.log(data);
 
     axios.defaults.withCredentials = true;
 
-    axios.post("http://localhost:3001/TravelLogin", data).then(response => {
+    axios.post("http://localhost:3001/Login", data).then(response => {
       console.log("Axios POST response:", response.status);
 
       if (response.status === 200) {
