@@ -10,20 +10,10 @@ const uuidv4 = require("uuid/v4");
 const path = require("path");
 const mysql = require("mysql");
 const fs = require("fs");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 app.set("view engine", "ejs");
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./uploads");
-  },
-  filename: (req, file, cb) => {
-    const newFilename = `test${path.extname(file.originalname)}`;
-    cb(null, newFilename);
-  }
-});
-
-const upload = multer({ storage });
 
 app.use(
   session({
@@ -36,6 +26,21 @@ app.use(
 );
 
 app.use(bodyParser.json());
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const folderName = "./uploads";
+    cb(null, folderName);
+  },
+  filename: (req, file, cb) => {
+    const newFilename = `${req.session.userid}-${
+      file.originalname
+    }${path.extname(file.originalname)}`;
+    console.log("file extension");
+    cb(null, newFilename);
+  }
+});
+
+const upload = multer({ storage });
 
 //Allow Access Control
 app.use(function(req, res, next) {
@@ -73,7 +78,6 @@ app.post("/Login", (req, res) => {
         path: "/"
       });
       req.session.userid = result[0].User_ID;
-      console.log(req.session.userid);
       res.writeHead(200, {
         "Content-Type": "text/plain"
       });
@@ -111,36 +115,44 @@ app.post("/Register", (req, res) => {
 
 app.post("/Owner", (req, res) => {
   console.log("Inside Owner POST request");
-  console.log(req.session.userid);
+  
 });
 
-/*app.get("/home", function(req, res) {
-  var sql = "SELECT * FROM property";
-  pool.getConnection(function(err, con) {
+app.get("/Home", (req, res) => {
+  let location = req.body.location;
+  let sql = "SELECT * FROM `property` WHERE `location` = ?";
+  pool.query(sql, [location], (err, result) => {
     if (err) {
+      throw err;
       res.writeHead(400, {
         "Content-Type": "text/plain"
       });
-      res.end("Could Not Get Connection Object");
+      res.end("No search results returned");
     } else {
-      con.query(sql, function(err, result) {
-        if (err) {
-          res.writeHead(400, {
-            "Content-Type": "text/plain"
-          });
-          res.end("Could Not Get Connection Object");
-        } else {
-          res.writeHead(200, {
-            "Content-Type": "application/json"
-          });
-          res.end(JSON.stringify(result));
-        }
+      res.writeHead(200, {
+        "Content-Type": "application/json"
       });
+      res.end(JSON.stringify(result));
     }
   });
 });
 
-app.post("/", upload.single("selectedFile"), (req, res) => {
+app.get("/PropertyList", (req, res) => {
+  console.log("Property Details");
+});
+
+app.get("/ProductDetails", (req,res) => {
+  console.log("ProductPage")
+})
+
+app.get("/TDash", (req,res) => {
+  console.log("Traveller dashboard");
+})
+
+app.get("/OwnerDash", (req,res) => {
+
+});
+app.post("/Photos", upload.single("selectedFile"), (req, res) => {
   if (!req.file) {
     console.log("No file received");
     res.send({
@@ -150,7 +162,7 @@ app.post("/", upload.single("selectedFile"), (req, res) => {
     console.log("File received!", res.file);
     res.send();
   }
-});*/
+});
 
 //start your server on port 3001
 app.listen(3001);

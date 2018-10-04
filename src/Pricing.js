@@ -16,7 +16,7 @@ class Pricing extends React.Component {
               ref={this.price}
               onChange={() => this.props.onChange(this.price.current.value)}
               id="price"
-              type="text"
+              type="number"
               className="form-control"
             />
           </div>

@@ -8,7 +8,7 @@ class Photos extends React.Component {
     let file = new FormData();
     file.append("selectedFile", files[0]);
 
-    axios.post("http://localhost:3001/", file).then(result => {
+    axios.post("http://localhost:3001/Photos", file).then(result => {
       console.log("File uploaded successfuly");
     });
 

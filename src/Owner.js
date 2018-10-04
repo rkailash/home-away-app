@@ -42,7 +42,7 @@ class Owner extends Component {
       case "pricing":
         return (
           <Pricing
-            onSubmit={() => this.handleSubmit()}
+            handleSubmit={() => this.handleSubmit()}
             onChange={price => this.setState({ price })}
           />
         );
