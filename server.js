@@ -57,45 +57,27 @@ app.post("/Login", (req, res) => {
   console.log("Inside Login POST request");
   let email = req.body.email;
   let password = req.body.password;
-  let sql =
-    "SELECT * FROM users WHERE Email = " +
-    mysql.escape(email) +
-    "AND Password = " +
-    mysql.escape(password);
-  pool.getConnection((err, con) => {
+  let sql = "SELECT * FROM `users` WHERE `Email` = ? AND `Password` = ?";
+  pool.query(sql, [email, password], (err, result) => {
     if (err) {
-      console.log("Could not connect to database!");
-      res.writeHead(400, {
+      console.log("Login failed with error");
+      throw err;
+      res.writeHead(404, {
         "Content-Type": "text/plain"
       });
-      res.end("Could not get connection object!");
+      res.end("Invalid Credentials!");
     } else {
-      console.log("Connection to database successful");
-      con.query(sql, (err, result) => {
-        if (err) {
-          console.log("Invalid credentials");
-          res.writeHead(400, {
-            "Content-Type": "text/plain"
-          });
-          res.end("Invalid Credentials");
-        } else {
-          console.log("Login successful");
-          res.cookie("user_cookie", "admin", {
-            maxAge: 900000,
-            httpOnly: false,
-            path: "/"
-          });
-          console.log(result);
-          req.session.userid = result[0].User_ID;
-          req.session.type = result[0].Type;
-          console.log(req.session.userid);
-          console.log(req.session.type);
-          res.writeHead(200, {
-            "Content-Type": "text/plain"
-          });
-          res.end("Login successful");
-        }
+      res.cookie("user_cookie", "admin", {
+        maxAge: 900000,
+        httpOnly: false,
+        path: "/"
       });
+      req.session.userid = result[0].User_ID;
+      console.log(req.session.userid);
+      res.writeHead(200, {
+        "Content-Type": "text/plain"
+      });
+      res.end("Successful Login");
     }
   });
 });
@@ -107,39 +89,22 @@ app.post("/Register", (req, res) => {
   let firstName = req.body.firstName;
   let lastName = req.body.lastName;
   let sql =
-    "INSERT INTO users (`User_ID`,`LastName`, `FirstName`, `Email`, `Password`, `Type`) VALUES (NULL," +
-    mysql.escape(lastName) +
-    "," +
-    mysql.escape(firstName) +
-    "," +
-    mysql.escape(email) +
-    "," +
-    mysql.escape(password) +
-    ",'Traveller')";
-  pool.getConnection((err, con) => {
+    "INSERT INTO users (`User_ID`,`LastName`, `FirstName`, `Email`, `Password`) VALUES (NULL,?,?,?,?)";
+
+  pool.query(sql, [lastName, firstName, email, password], (err, result) => {
     if (err) {
-      console.log("Could not connect to database!");
+      console.log("Unable to create user");
+      throw err;
       res.writeHead(400, {
         "Content-Type": "text/plain"
       });
-      res.end("Could not get connection object!");
+      res.end("Unable to create user");
     } else {
-      console.log("Connection to database successful");
-      con.query(sql, (err, result) => {
-        if (err) {
-          console.log("Unable to create user", err);
-          res.writeHead(400, {
-            "Content-Type": "text/plain"
-          });
-          res.end("Unable to create user");
-        } else {
-          console.log("User creation successful");
-          res.writeHead(200, {
-            "Content-Type": "text/plain"
-          });
-          res.end("User created successfuly");
-        }
+      console.log("User creation successful");
+      res.writeHead(200, {
+        "Content-Type": "text/plain"
       });
+      res.end("User created successfully");
     }
   });
 });

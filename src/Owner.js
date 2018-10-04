@@ -26,20 +26,39 @@ class Owner extends Component {
   renderActiveNav = () => {
     switch (this.state.activeNav) {
       case "location":
-        return <Location onChange={(location) => this.setState({...this.state, location})} />;
+        return (
+          <Location
+            onChange={location => this.setState({ ...this.state, location })}
+          />
+        );
       case "details":
-        return <Details onChange={(details) => this.setState({...this.state, details})} />;
+        return (
+          <Details
+            onChange={details => this.setState({ ...this.state, details })}
+          />
+        );
       case "photos":
         return <Photos />;
       case "pricing":
-        return <Pricing onSubmit={() => this.handleSubmit()} onChange={(price) => this.setState({price})} />;
+        return (
+          <Pricing
+            onSubmit={() => this.handleSubmit()}
+            onChange={price => this.setState({ price })}
+          />
+        );
       default:
         return null;
     }
   };
   handleSubmit = () => {
+    const data = {
+      location: this.state.location,
+      details: this.state.details,
+      price: this.state.price
+    };
 
-  }
+    console.log(data);
+  };
   render() {
     const { activeNav } = this.state;
     return (

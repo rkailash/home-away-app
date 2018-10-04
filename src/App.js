@@ -18,11 +18,7 @@ class App extends Component {
     return (
       <div>
         <div className="body-container">
-<<<<<<< HEAD
-          <Route path="/" component={Home} />
-=======
-          <Route path="/" component={Owner} />
->>>>>>> db7196080b8dd46c7cd4a5d0c44167145a8c84cf
+          <Route exact path="/" component={Home} />
           <Route path="/TravellerLogin" component={Login} />
           <Route path="/OwnerLogin" component={OwnerLogin} />
           {/* <Route path="/Home" component={Home} /> */}

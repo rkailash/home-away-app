@@ -8,4 +8,17 @@ const pool = mysql.createPool({
   database: "homeaway"
 });
 
+pool.getConnection(err => {
+  if (err) {
+    console.log("pool.getConnection failed with error");
+    throw err;
+    res.writeHead(400, {
+      "Content-Type": "text/plain"
+    });
+    res.end("Could not get connection object!");
+  } else {
+    console.log("Database connction successful");
+  }
+});
+
 module.exports = pool;

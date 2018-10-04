@@ -37,18 +37,16 @@ class OwnerLogin extends Component {
       } else {
         console.log("Login unsuccessful!");
         this.setState({ authFlag: false });
+        this.setState({ signUpFlag: true });
       }
     });
   };
-
-  handleSignUp = e => {
-    e.preventDefault();
-    this.setState({ signUpFlag: true });
-  };
   render() {
     const { account } = this.state;
+    /*    if (this.state.signUpFlag === true) return <Redirect to="/Register" />;
+  */
     if (this.state.signUpFlag === true) return <Redirect to="/Register" />;
-    if (this.state.authFlag === true && cookie.load("owner_cookie")) {
+    else if (this.state.authFlag === true && cookie.load("user_cookie")) {
       return <Redirect to="/Owner" />;
     } else {
       return (
@@ -73,7 +71,7 @@ class OwnerLogin extends Component {
                 <input
                   tabIndex={2}
                   type="password"
-                  name="psw"
+                  name="password"
                   placeholder="Password"
                   onChange={this.handleChange}
                 />

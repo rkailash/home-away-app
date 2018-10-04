@@ -1,4 +1,4 @@
-import React, {createRef} from "react";
+import React, { createRef } from "react";
 
 class Pricing extends React.Component {
   constructor(props) {
@@ -12,7 +12,13 @@ class Pricing extends React.Component {
         <form className="location-form">
           <div className="form-group">
             <label>Price</label>
-            <input ref={this.price} onChange={() => this.props.onChange(this.price.current.value)} id="price" type="text" className="form-control" />
+            <input
+              ref={this.price}
+              onChange={() => this.props.onChange(this.price.current.value)}
+              id="price"
+              type="text"
+              className="form-control"
+            />
           </div>
           <button
             type="button"
