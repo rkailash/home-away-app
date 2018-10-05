@@ -3,30 +3,31 @@ import ImageGallery from "templates/ImageGallery";
 import RatingDisplay from "templates/RatingDisplay";
 import "styles/listing.scss";
 
-const items = [
+const images = [
   {
-    property_id: "123",
-    property_type: "apartment",
-    img_src: "",
-    name: "Big spacious apartment",
-    bedrooms: 1,
-    bathrooms: 1,
-    rating: 2,
-    sleeps: 4,
-    price: 100,
-    area: 1500
+    key: "1",
+    value:
+      "https://odis.homeaway.com/odis/listing/c64e4758-21ad-40c3-98f2-62343335315c.c10.jpg"
   },
   {
-    property_id: "124",
-    property_type: "villa",
-    img_src: "",
-    name: "House in a nice area",
-    bedrooms: 1,
-    bathrooms: 1,
-    sleeps: 4,
-    price: 100,
-    rating: 4,
-    area: 700
+    key: "2",
+    value:
+      "https://cdn1.caratlane.com/media/queldorei/shopper/revolution/Encircle_Hp-02-rc1-1600.jpg"
+  },
+  {
+    key: "3",
+    value:
+      "https://cdn13.caratlane.com/media/queldorei/shopper/revolution/BLUE-butterfly-banner_HP-rc1-1600.jpg"
+  },
+  {
+    key: "4",
+    value:
+      "https://cdn1.caratlane.com/media/queldorei/shopper/revolution/Save_Upto25_3-rc1-1600.jpg"
+  },
+  {
+    key: "5",
+    value:
+      "https://cdn13.caratlane.com/media/queldorei/shopper/revolution/RTS_Hp-rc1-1600.jpg"
   }
 ];
 
@@ -36,11 +37,12 @@ class Listing extends Component {
     this.state = {};
   }
   render() {
+    const { items } = this.props.location.state.referrer;
     return (
       <div className="listing">
-        {this.props.items.map((item, key) => (
+        {items.map((item, key) => (
           <div className="list-item" key={item.property_id}>
-            <ImageGallery showThumbnail={false} />
+            <ImageGallery showThumbnail={false} images={images} />
             <div className="right-container">
               <div className="top-container">
                 <h4>{item.name}</h4>

@@ -18,12 +18,13 @@ class App extends Component {
     return (
       <div>
         <div className="body-container">
-          <Route exact path="/" component={Home} />
+          <Route exact path="/" component={Login} />
           <Route path="/TravellerLogin" component={Login} />
           <Route path="/OwnerLogin" component={OwnerLogin} />
           <Route path="/Home" component={Home} />
-          <Route path="/Register" component={Register} /> */}
+          <Route path="/Register" component={Register} />
           <Route path="/Owner" component={Owner} />
+          <Route path="/Listing" component={Listing} />
         </div>
       </div>
     );
