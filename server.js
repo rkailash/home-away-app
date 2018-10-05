@@ -62,26 +62,36 @@ app.post("/Login", (req, res) => {
   console.log("Inside Login POST request");
   let email = req.body.email;
   let password = req.body.password;
-  let sql = "SELECT * FROM `users` WHERE `Email` = ? AND `Password` = ?";
-  pool.query(sql, [email, password], (err, result) => {
+  let sql = "SELECT * FROM `users` WHERE `email` = ?";
+  pool.query(sql, [email], (err, result) => {
     if (err) {
-      console.log("Login failed with error");
+      console.log("Email not found in database");
       throw err;
       res.writeHead(404, {
         "Content-Type": "text/plain"
       });
-      res.end("Invalid Credentials!");
+      res.end("Email not found!");
     } else {
-      res.cookie("user_cookie", "admin", {
-        maxAge: 900000,
-        httpOnly: false,
-        path: "/"
+      console.log("SQL result", result);
+      bcrypt.compare(password, result[0].password, (err, hash) => {
+        console.log("Inside compare..");
+        if (err) throw err;
+        if (hash == true) {
+          console.log("hash is true");
+          res.cookie("user_cookie", "admin", {
+            maxAge: 900000,
+            httpOnly: false,
+            path: "/"
+          });
+          req.session.userid = result[0].userid;
+          res.writeHead(200, {
+            "Content-Type": "text/plain"
+          });
+          res.end("Successful Login");
+        } else {
+          console.log("Passwords don't match");
+        }
       });
-      req.session.userid = result[0].User_ID;
-      res.writeHead(200, {
-        "Content-Type": "text/plain"
-      });
-      res.end("Successful Login");
     }
   });
 });
@@ -93,35 +103,68 @@ app.post("/Register", (req, res) => {
   let firstName = req.body.firstName;
   let lastName = req.body.lastName;
   let sql =
-    "INSERT INTO users (`User_ID`,`LastName`, `FirstName`, `Email`, `Password`) VALUES (NULL,?,?,?,?)";
+    "INSERT INTO users (`userid`,`lastname`, `firstname`, `email`, `password`) VALUES (NULL,?,?,?,?)";
 
-  pool.query(sql, [lastName, firstName, email, password], (err, result) => {
-    if (err) {
-      console.log("Unable to create user");
-      throw err;
-      res.writeHead(400, {
-        "Content-Type": "text/plain"
-      });
-      res.end("Unable to create user");
-    } else {
-      console.log("User creation successful");
-      res.writeHead(200, {
-        "Content-Type": "text/plain"
-      });
-      res.end("User created successfully");
-    }
+  bcrypt.hash(password, saltRounds, (err, hash) => {
+    if (err) throw err;
+    password = hash;
+    pool.query(sql, [lastName, firstName, email, password], (err, result) => {
+      if (err) {
+        console.log("Unable to create user");
+        throw err;
+        res.writeHead(400, {
+          "Content-Type": "text/plain"
+        });
+        res.end("Unable to create user");
+      } else {
+        console.log("User creation successful");
+        res.writeHead(200, {
+          "Content-Type": "application/json"
+        });
+        res.end(JSON.stringify(result));
+      }
+    });
   });
 });
 
 app.post("/Owner", (req, res) => {
   console.log("Inside Owner POST request");
-  
+  let ownerId = req.session.userid;
+  let name = req.body.headline;
+  let sleeps = req.body.sleeps;
+  let bathrooms = req.body.bathrooms;
+  let bedrooms = req.body.bedrooms;
+  let type = req.body.type;
+  let price = req.body.price;
+  let location = req.body.location;
+  let sql =
+    "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,?)";
+  pool.query(
+    sql,
+    [ownerId, name, sleeps, bathrooms, bedrooms, type, price, location],
+    (err, result) => {
+      if (err) {
+        console.log("Unable post property");
+        throw err;
+        res.writeHead(400, {
+          "Content-Type": "text/plain"
+        });
+        res.end("Unable to create property");
+      } else {
+        console.log("Property created successful", result);
+        res.writeHead(200, {
+          "Content-Type": "application/json"
+        });
+        res.end(JSON.stringify(result));
+      }
+    }
+  );
 });
 
 app.get("/Home", (req, res) => {
   let location = req.body.location;
   let sql = "SELECT * FROM `property` WHERE `location` = ?";
-  pool.query(sql, [location], (err, result) => {
+  pool.query(sql, location, (err, result) => {
     if (err) {
       throw err;
       res.writeHead(400, {
@@ -139,19 +182,36 @@ app.get("/Home", (req, res) => {
 
 app.get("/PropertyList", (req, res) => {
   console.log("Property Details");
+  let location = req.query.location;
+  console.log("Request body:", req.query.location);
+  let sql = "SELECT * FROM `property` WHERE `location` = ?";
+  pool.query(sql, [location], (err, result) => {
+    console.log("SQL query", sql);
+    if (err) {
+      throw err;
+      res.writeHead(400, {
+        "Content-Type": "text/plain"
+      });
+      res.end("No search results returned");
+    } else {
+      res.writeHead(200, {
+        "Content-Type": "application/json"
+      });
+      res.end(JSON.stringify(result));
+      console.log(result);
+    }
+  });
 });
 
-app.get("/ProductDetails", (req,res) => {
-  console.log("ProductPage")
-})
+app.get("/ProductDetails", (req, res) => {
+  console.log("ProductPage");
+});
 
-app.get("/TDash", (req,res) => {
+app.get("/TDash", (req, res) => {
   console.log("Traveller dashboard");
-})
-
-app.get("/OwnerDash", (req,res) => {
-
 });
+
+app.get("/OwnerDash", (req, res) => {});
 app.post("/Photos", upload.single("selectedFile"), (req, res) => {
   if (!req.file) {
     console.log("No file received");

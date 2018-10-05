@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from "axios";
 import Location from "./Location";
 import Pricing from "./Pricing";
 import Photos from "./Photos";
@@ -58,6 +59,16 @@ class Owner extends Component {
     };
 
     console.log(data);
+    axios.post("http://localhost:3001/Owner", data).then(response => {
+      console.log("Axios POST response:", response.status);
+
+      if (response.status === 200) {
+        console.log("Property details posted!");
+        console.log(response);
+      } else {
+        console.log("Property details not posted!");
+      }
+    });
   };
   render() {
     const { activeNav } = this.state;

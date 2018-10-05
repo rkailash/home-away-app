@@ -48,7 +48,7 @@ class Login extends Component {
     const { account } = this.state;
     const { title } = this.props;
     if (this.state.signUpFlag === true) return <Redirect to="/Register" />;
-    if (this.state.authFlag === true && cookie.load("travel_cookie")) {
+    if (this.state.authFlag === true && cookie.load("user_cookie")) {
       return <Redirect to="/Home" />;
     } else {
       return (

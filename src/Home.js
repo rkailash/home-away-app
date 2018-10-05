@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from "axios";
 import Search from "./Search";
 import RecentActivity from "./RecentActivity";
 import Header from "./Header";
@@ -6,9 +7,19 @@ import "styles/home.scss";
 
 class Home extends Component {
   onClickSearch = i => {
-    // i = {
-    //   location: PLACE_ID
-    // }
+    console.log("Inside click");
+    axios.defaults.withCredentials = true;
+
+    axios
+      .get(`http://localhost:3001/PropertyList?location=san%20jose`)
+      .then(response => {
+        console.log("Axios POST response:", response.status);
+        if (response.status === 200) {
+          console.log(response);
+        } else {
+          console.log(response);
+        }
+      });
   };
   render() {
     return (
