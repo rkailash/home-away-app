@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ImageGallery from "templates/ImageGallery";
 import RatingDisplay from "templates/RatingDisplay";
+import { Link } from "react-router-dom";
 import "styles/listing.scss";
 
 const images = [
@@ -45,7 +46,9 @@ class Listing extends Component {
             <ImageGallery showThumbnail={false} images={images} />
             <div className="right-container">
               <div className="top-container">
-                <h4>{item.name}</h4>
+                <Link to="/ProductPage">
+                  <h4>{item.name}</h4>
+                </Link>
                 <div className="property-info">
                   <span>{`${
                     item.bedrooms === 0

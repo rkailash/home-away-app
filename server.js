@@ -70,7 +70,7 @@ app.post("/Login", (req, res) => {
       res.writeHead(404, {
         "Content-Type": "text/plain"
       });
-      res.end("Email not found!");
+      res.end("Email not found. Please sign up!");
     } else {
       console.log("SQL result", result);
       bcrypt.compare(password, result[0].password, (err, hash) => {
@@ -96,34 +96,51 @@ app.post("/Login", (req, res) => {
   });
 });
 
-app.post("/Register", (req, res) => {
+app.post("/Register", (request, response) => {
   console.log("Inside Register POST request");
-  let email = req.body.email;
-  let password = req.body.password;
-  let firstName = req.body.firstName;
-  let lastName = req.body.lastName;
-  let sql =
+  let email = request.body.email;
+  let password = request.body.password;
+  let firstName = request.body.firstName;
+  let lastName = request.body.lastName;
+  let sql1 = "SELECT * from `users` WHERE `email`= ?";
+  let sql2 =
     "INSERT INTO users (`userid`,`lastname`, `firstname`, `email`, `password`) VALUES (NULL,?,?,?,?)";
-
-  bcrypt.hash(password, saltRounds, (err, hash) => {
-    if (err) throw err;
-    password = hash;
-    pool.query(sql, [lastName, firstName, email, password], (err, result) => {
-      if (err) {
-        console.log("Unable to create user");
-        throw err;
-        res.writeHead(400, {
+  pool.query(sql1, [email], (dbError, isUser) => {
+    if (dbError) throw dbError;
+    else {
+      console.log("Check if email already exists. If no continue..");
+      if (isUser.length === 0) {
+        bcrypt.hash(password, saltRounds, (err, hash) => {
+          if (err) throw err;
+          password = hash;
+          pool.query(
+            sql2,
+            [lastName, firstName, email, password],
+            (err, result) => {
+              if (err) {
+                console.log("Unable to create user");
+                throw err;
+                response.writeHead(400, {
+                  "Content-Type": "text/plain"
+                });
+                response.end("Unable to create user");
+              } else {
+                console.log("User creation successful");
+                response.writeHead(200, {
+                  "Content-Type": "application/json"
+                });
+                response.end(JSON.stringify(result));
+              }
+            }
+          );
+        });
+      } else {
+        response.writeHead(400, {
           "Content-Type": "text/plain"
         });
-        res.end("Unable to create user");
-      } else {
-        console.log("User creation successful");
-        res.writeHead(200, {
-          "Content-Type": "application/json"
-        });
-        res.end(JSON.stringify(result));
+        response.end("Email already exists. Please sign in");
       }
-    });
+    }
   });
 });
 
@@ -138,10 +155,10 @@ app.post("/Owner", (req, res) => {
   let price = req.body.price;
   let location = req.body.location;
   let sql =
-    "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,?)";
+    "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,'san jose')";
   pool.query(
     sql,
-    [ownerId, name, sleeps, bathrooms, bedrooms, type, price, location],
+    [ownerId, name, sleeps, bathrooms, bedrooms, type, price],
     (err, result) => {
       if (err) {
         console.log("Unable post property");
@@ -162,8 +179,9 @@ app.post("/Owner", (req, res) => {
 });
 
 app.get("/Home", (req, res) => {
-  let location = req.body.location;
-  let sql = "SELECT * FROM `property` WHERE `location` = ?";
+  console.log(req.query);
+  let location = req.query.location;
+  let sql = "SELECT * FROM `property` WHERE `location` = san jose";
   pool.query(sql, location, (err, result) => {
     if (err) {
       throw err;
@@ -204,7 +222,23 @@ app.get("/PropertyList", (req, res) => {
 });
 
 app.get("/ProductDetails", (req, res) => {
-  console.log("ProductPage");
+  let propertyId = req.body.propertyId;
+  let sql = "SELECT * from `property` where `propertyid`= ?";
+  pool.query(sql, [propertyid], (err, result) => {
+    if (err) {
+      throw err;
+      res.writeHead(400, {
+        "Content-Type": "text/plain"
+      });
+      res.end("No search results returned");
+    } else {
+      res.writeHead(200, {
+        "Content-Type": "application/json"
+      });
+      res.end(JSON.stringify(result));
+      console.log(result);
+    }
+  });
 });
 
 app.get("/TDash", (req, res) => {
@@ -225,5 +259,6 @@ app.post("/Photos", upload.single("selectedFile"), (req, res) => {
 });
 
 //start your server on port 3001
+app.use(express.static(path.join(__dirname, "images")));
 app.listen(3001);
 console.log("Server Listening on port 3001");

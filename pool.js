@@ -17,7 +17,7 @@ pool.getConnection(err => {
     });
     res.end("Could not get connection object!");
   } else {
-    console.log("Database connction successful");
+    console.log("Database connection successful");
   }
 });
 

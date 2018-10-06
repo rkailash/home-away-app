@@ -24,7 +24,6 @@ class Login extends Component {
     console.log("Inside handlesubmit method");
 
     const data = { ...this.state.account };
-    console.log(data);
 
     axios.defaults.withCredentials = true;
 

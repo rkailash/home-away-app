@@ -12,6 +12,11 @@ class OwnerLogin extends Component {
     signUpFlag: false
   };
 
+  handleSignUp = e => {
+    e.preventDefault();
+    this.setState({ signUpFlag: true });
+  };
+
   handleChange = e => {
     const account = { ...this.state.account };
     account[e.currentTarget.name] = e.currentTarget.value;
@@ -60,6 +65,12 @@ class OwnerLogin extends Component {
             <div className="login-container">
               <form>
                 <h3>Owner Login</h3>
+                <p>
+                  Need an account?{" "}
+                  <Link to="/Register" onClick={this.handleSignUp}>
+                    Sign Up
+                  </Link>
+                </p>
                 <input
                   autoFocus
                   tabIndex={1}
