@@ -92,7 +92,7 @@ class PropertyDetails extends Component {
             </svg>
           </div>
         </div>
-        <RatingDisplay rating={item.rating} />
+        {item.rating !== undefined && <RatingDisplay rating={item.rating} />}
         <p className="available-message">Your dates are available!</p>
         <div className="user-selection">
           <DateRangePicker

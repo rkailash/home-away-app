@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import ImageGallery from "templates/ImageGallery";
+import axios from "axios";
 import PropertyDetails from "./PropertyDetails";
 import "styles/productPage.scss";
 
@@ -42,16 +43,25 @@ const item = {
   halfBaths: 0
 };
 
-class Listing extends Component {
+class Property extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isFullScreen: false,
-      currentImagePos: 0
+      currentImagePos: 0,
+      propertyDetails: undefined
     };
   }
-  setCurrentImagePos = currentImagePos => {
-    this.setState({ currentImagePos });
+  componentDidMount() {
+    this.getPropertyDetails();
+  }
+  getPropertyDetails = () => {
+    axios
+      .get(`http://localhost:3001${this.props.location.pathname}`)
+      .then(response => {
+        console.log("GET response :", response.data);
+        this.setState({ propertyDetails: response.data[0] });
+      });
   };
   openFullScreen = () => {
     this.setState({ isFullScreen: true });
@@ -60,16 +70,21 @@ class Listing extends Component {
     this.setState({ isFullScreen: false });
   };
   render() {
+    const { propertyDetails } = this.state;
     return (
       <div className="product-page">
         <div className="top-container">
           <ImageGallery
             onExpand={() => this.openFullScreen()}
-            onToggle={(i) => this.setCurrentImagePos(i)}
+            onToggle={i => this.setCurrentImagePos(i)}
             images={images}
             isExpandable
           />
-          <PropertyDetails item={item} />
+          {propertyDetails === undefined ? (
+            <div className="loading">Loading...</div>
+          ) : (
+            <PropertyDetails item={propertyDetails} />
+          )}
         </div>
         {this.state.isFullScreen && (
           <div className="fullscreen-gallery">
@@ -88,4 +103,4 @@ class Listing extends Component {
   }
 }
 
-export default Listing;
+export default Property;

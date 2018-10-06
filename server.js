@@ -221,10 +221,10 @@ app.get("/PropertyList", (req, res) => {
   });
 });
 
-app.get("/ProductDetails", (req, res) => {
-  let propertyId = req.body.propertyId;
+app.get("/Property/:id", (req, res) => {
+  let propertyId = req.params.id;
   let sql = "SELECT * from `property` where `propertyid`= ?";
-  pool.query(sql, [propertyid], (err, result) => {
+  pool.query(sql, [propertyId], (err, result) => {
     if (err) {
       throw err;
       res.writeHead(400, {

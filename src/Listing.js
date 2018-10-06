@@ -46,7 +46,7 @@ class Listing extends Component {
             <ImageGallery showThumbnail={false} images={images} />
             <div className="right-container">
               <div className="top-container">
-                <Link to="/ProductPage">
+                <Link to={`/Property/${item.propertyid}`}>
                   <h4>{item.name}</h4>
                 </Link>
                 <div className="property-info">

@@ -3,7 +3,7 @@ import Find from "lodash/find";
 import { Route, Redirect } from "react-router-dom";
 import Header from "./Header";
 import Home from "./Home";
-import ProductPage from "./ProductPage";
+import Property from "./Property";
 import Login from "./TravelerLogin";
 import OwnerLogin from "./OwnerLogin";
 import Owner from "./Owner";
@@ -25,7 +25,7 @@ class App extends Component {
           <Route path="/Register" component={Register} />
           <Route path="/Owner" component={Owner} />
           <Route path="/Listing" component={Listing} />
-          <Route path="/ProductPage" component={ProductPage} />
+          <Route path="/Property" component={Property} />
         </div>
       </div>
     );
