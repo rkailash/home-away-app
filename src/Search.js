@@ -8,6 +8,7 @@ import Select from "react-select";
 import Counter from "templates/Counter";
 import RadioGroup from "templates/RadioGroup";
 import Dropdown from "templates/Dropdown";
+import moment from 'moment';
 import "react-dates/initialize";
 import "react-dates/lib/css/_datepicker.css";
 import "styles/search.scss";
@@ -19,8 +20,8 @@ class Search extends Component {
     this.state = {
       dropdownIsOpen: false,
       service: null,
-      startDate: null,
-      endDate: null,
+      startDate: props.query.startDate,
+      endDate: props.query.endDate,
       guests: {
         adults: 1,
         children: 0,
@@ -67,9 +68,9 @@ class Search extends Component {
   openDropdown = () =>
     this.setState({ dropdownIsOpen: !this.state.dropdownIsOpen });
   onClickSearch = () => {
-    const { location } = this.state;
+    const { location, startDate, endDate, guests } = this.state;
     this.props.onClick({
-      location
+      location, startDate, endDate, guests
     });
   };
   render() {
@@ -80,6 +81,7 @@ class Search extends Component {
       focusedInput,
       dropdownIsOpen
     } = this.state;
+    console.log('startDate', startDate);
     return (
       <div className="search">
         <input
@@ -91,9 +93,9 @@ class Search extends Component {
         <div className="v-line" />
         <DateRangePicker
           startDate={startDate} // momentPropTypes.momentObj or null,
-          startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
+          startDateId="listing_header_start_date" // PropTypes.string.isRequired,
           endDate={endDate} // momentPropTypes.momentObj or null,
-          endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
+          endDateId="listing_header_end_date" // PropTypes.string.isRequired,
           startDatePlaceholderText="Arrive"
           endDatePlaceholderText="Depart"
           onDatesChange={({ startDate, endDate }) =>
@@ -139,6 +141,7 @@ class Search extends Component {
             </div>
           </Dropdown>
         </div>
+        <div className="v-line" />
         <button type="button" className="submit" onClick={this.onClickSearch}>
           Search
         </button>
@@ -148,7 +151,11 @@ class Search extends Component {
 }
 
 Search.defaultProps = {
-  onClick: () => {}
+  onClick: () => {},
+  query: {
+    startDate: null,
+    endDate: null
+  }
 };
 
 export default Search;

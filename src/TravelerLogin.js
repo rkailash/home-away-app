@@ -9,7 +9,7 @@ class Login extends Component {
   state = {
     account: { email: "", password: "" },
     authFlag: false,
-    signUpFlag: false
+    signUpFlag: false,
   };
 
   handleChange = e => {
@@ -32,6 +32,7 @@ class Login extends Component {
 
       if (response.status === 200) {
         this.setState({ authFlag: true });
+        this.props.setUserInfo(response.data[0]);
       } else {
         console.log("Login unsuccessful!");
         this.setState({ authFlag: false });
@@ -44,7 +45,7 @@ class Login extends Component {
     this.setState({ signUpFlag: true });
   };
   render() {
-    const { account } = this.state;
+    const { account, userInfo } = this.state;
     const { title } = this.props;
     if (this.state.signUpFlag === true) return <Redirect to="/Register" />;
     if (this.state.authFlag === true && cookie.load("user_cookie")) {

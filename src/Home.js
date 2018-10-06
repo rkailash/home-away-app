@@ -5,17 +5,19 @@ import RecentActivity from "./RecentActivity";
 import Header from "./Header";
 import "styles/home.scss";
 import { Redirect } from "react-router-dom";
+import { userInfo } from "os";
 
 class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       goToListing: false,
-      items: []
+      items: [],
     };
   }
-  onClickSearch = i => {
+  onClickSearch = query => {
     console.log("Inside click");
+    this.props.saveSearchQuery({ query })
     axios.defaults.withCredentials = true;
 
     axios
@@ -30,7 +32,7 @@ class Home extends Component {
       });
   };
   render() {
-    const { items } = this.state;
+    const { items, query } = this.state;
     if (this.state.goToListing) {
       return (
         <Redirect
@@ -48,7 +50,7 @@ class Home extends Component {
     return (
       <div className="home">
         <div className="hero-container">
-          <Header design="gradient" showLogin />
+          <Header design="gradient" showLogin userInfo={this.props.userInfo} />
           <h1>
             Book beach houses, cabins,
             <br />

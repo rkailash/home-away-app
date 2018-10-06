@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import ImageGallery from "templates/ImageGallery";
 import RatingDisplay from "templates/RatingDisplay";
 import { Link } from "react-router-dom";
+import Header from './Header';
+import Search from './Search';
 import "styles/listing.scss";
 
 const images = [
@@ -41,8 +43,10 @@ class Listing extends Component {
     const { items } = this.props.location.state.referrer;
     return (
       <div className="listing">
+        <Header />
+        <Search query={this.props.query} />
         {items.map((item, key) => (
-          <div className="list-item" key={item.property_id}>
+          <div className="list-item" key={key}>
             <ImageGallery showThumbnail={false} images={images} />
             <div className="right-container">
               <div className="top-container">

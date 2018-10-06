@@ -10,7 +10,7 @@ const uuidv4 = require("uuid/v4");
 const path = require("path");
 const mysql = require("mysql");
 const fs = require("fs");
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 app.set("view engine", "ejs");
@@ -62,8 +62,8 @@ app.post("/Login", (req, res) => {
   console.log("Inside Login POST request");
   let email = req.body.email;
   let password = req.body.password;
-  let sql = "SELECT * FROM `users` WHERE `email` = ?";
-  pool.query(sql, [email], (err, result) => {
+  let sql = "SELECT * FROM `users` WHERE `email` = ? AND `password` = ?";
+  pool.query(sql, [email, password], (err, result) => {
     if (err) {
       console.log("Email not found in database");
       throw err;
@@ -73,25 +73,35 @@ app.post("/Login", (req, res) => {
       res.end("Email not found. Please sign up!");
     } else {
       console.log("SQL result", result);
-      bcrypt.compare(password, result[0].password, (err, hash) => {
-        console.log("Inside compare..");
-        if (err) throw err;
-        if (hash == true) {
-          console.log("hash is true");
-          res.cookie("user_cookie", "admin", {
-            maxAge: 900000,
-            httpOnly: false,
-            path: "/"
-          });
-          req.session.userid = result[0].userid;
-          res.writeHead(200, {
-            "Content-Type": "text/plain"
-          });
-          res.end("Successful Login");
-        } else {
-          console.log("Passwords don't match");
-        }
+      // bcrypt.compare(password, result[0].password, (err, hash) => {
+      //   console.log("Inside compare..");
+      //   if (err) throw err;
+      //   if (hash == true) {
+      //     console.log("hash is true");
+      //     res.cookie("user_cookie", "admin", {
+      //       maxAge: 900000,
+      //       httpOnly: false,
+      //       path: "/"
+      //     });
+      //     req.session.userid = result[0].userid;
+      //     res.writeHead(200, {
+      //       "Content-Type": "text/plain"
+      //     });
+      //     res.end("Successful Login");
+      //   } else {
+      //     console.log("Passwords don't match");
+      //   }
+      // });
+      res.cookie("user_cookie", "admin", {
+        maxAge: 900000,
+        httpOnly: false,
+        path: "/"
       });
+      req.session.userid = result[0].userid;
+      res.writeHead(200, {
+        "Content-Type": "text/plain"
+      });
+      res.end(JSON.stringify(result));
     }
   });
 });
@@ -110,30 +120,26 @@ app.post("/Register", (request, response) => {
     else {
       console.log("Check if email already exists. If no continue..");
       if (isUser.length === 0) {
-        bcrypt.hash(password, saltRounds, (err, hash) => {
-          if (err) throw err;
-          password = hash;
-          pool.query(
-            sql2,
-            [lastName, firstName, email, password],
-            (err, result) => {
-              if (err) {
-                console.log("Unable to create user");
-                throw err;
-                response.writeHead(400, {
-                  "Content-Type": "text/plain"
-                });
-                response.end("Unable to create user");
-              } else {
-                console.log("User creation successful");
-                response.writeHead(200, {
-                  "Content-Type": "application/json"
-                });
-                response.end(JSON.stringify(result));
-              }
+        pool.query(
+          sql2,
+          [lastName, firstName, email, password],
+          (err, result) => {
+            if (err) {
+              console.log("Unable to create user");
+              throw err;
+              response.writeHead(400, {
+                "Content-Type": "text/plain"
+              });
+              response.end("Unable to create user");
+            } else {
+              console.log("User creation successful");
+              response.writeHead(200, {
+                "Content-Type": "application/json"
+              });
+              response.end(JSON.stringify(result));
             }
-          );
-        });
+          }
+        );
       } else {
         response.writeHead(400, {
           "Content-Type": "text/plain"

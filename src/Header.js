@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { Link } from "react-router-dom";
 import {
   Dropdown,
@@ -7,6 +7,37 @@ import {
   DropdownItem
 } from "reactstrap";
 import "styles/header.scss";
+
+const LoginDropdown = () => (
+  <Fragment>
+    <DropdownToggle caret>Login</DropdownToggle>
+    <DropdownMenu>
+      <DropdownItem>
+        <Link to="/TravellerLogin">Traveler Login</Link>
+      </DropdownItem>
+      <DropdownItem>
+        <Link to="/OwnerLogin">Owner Login</Link>
+      </DropdownItem>
+    </DropdownMenu>
+  </Fragment>
+);
+
+const UserDropdown = ({ name }) => (
+  <Fragment>
+    <DropdownToggle caret>{name}</DropdownToggle>
+    <DropdownMenu>
+      <DropdownItem>
+        <Link to="/Traveler/profile">My Profile</Link>
+      </DropdownItem>
+      <DropdownItem>
+        <Link to="/Traveler/trips">My Trips</Link>
+      </DropdownItem>
+      <DropdownItem>
+        <Link to="/OwnerLogin">Log Out</Link>
+      </DropdownItem>
+    </DropdownMenu>
+  </Fragment>
+);
 
 class Header extends Component {
   constructor(props) {
@@ -24,7 +55,7 @@ class Header extends Component {
     }));
   };
   render() {
-    const { showLogin, design } = this.props;
+    const { showLogin, design, userInfo } = this.props;
     return (
       <div className={`header ${design === "gradient" ? "gradient" : ""}`}>
         <Link className="logo" to="/">
@@ -39,19 +70,13 @@ class Header extends Component {
         <div className="right-container">
           {showLogin && (
             <Dropdown
-              className="header-menu"
+              className={`header-menu${userInfo === undefined ? '' : ' user-profile'}`}
               isOpen={this.state.dropdownOpen}
               toggle={() => this.toggle()}
             >
-              <DropdownToggle caret>Login</DropdownToggle>
-              <DropdownMenu>
-                <DropdownItem>
-                  <Link to="/TravellerLogin">Traveler Login</Link>
-                </DropdownItem>
-                <DropdownItem>
-                  <Link to="/OwnerLogin">Owner Login</Link>
-                </DropdownItem>
-              </DropdownMenu>
+              {
+                userInfo === undefined ? <LoginDropdown /> : <UserDropdown name={`${userInfo.firstname} ${userInfo.lastname.charAt(0)}`} />
+              }
             </Dropdown>
           )}
           <button type="button" className="lyp">
