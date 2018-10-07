@@ -13,7 +13,7 @@ const Logout = ({setUserInfo}) => {
         }
     });
     return (
-        <Redirect to="/Home" />
+        <Redirect to="/" />
     );
 };
 
