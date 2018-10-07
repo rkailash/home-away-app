@@ -11,6 +11,7 @@ const path = require("path");
 const mysql = require("mysql");
 const fs = require("fs");
 const bcrypt = require("bcrypt");
+var serveStatic = require('serve-static')
 const saltRounds = 10;
 
 app.set("view engine", "ejs");
@@ -78,7 +79,7 @@ app.post("/Login", (req, res) => {
         if (err) throw err;
         if (hash == true) {
           console.log("hash is true");
-          res.cookie("user_cookie", "admin", {
+          res.cookie("user_cookie", result[0].userid, {
             maxAge: 900000,
             httpOnly: false,
             path: "/"
@@ -95,6 +96,18 @@ app.post("/Login", (req, res) => {
     }
   });
 });
+
+app.get("/Logout", (req, res) => {
+  if (req.session) {
+    req.session.destroy(function(err) {
+      if(err) {
+        return res.end('Unable to logout');
+      } else {
+        return res.end('Logout Successful');
+      }
+    });
+  }
+})
 
 app.post("/Register", (request, response) => {
   console.log("Inside Register POST request");
@@ -197,7 +210,9 @@ app.get("/Home", (req, res) => {
 app.get("/PropertyList", (req, res) => {
   console.log("Property Details");
   let location = req.query.location;
-  console.log("Request body:", req.query.location);
+  let startdate = req.query.startDate;
+  let enddate = req.query.endDate;
+  console.log("Request body:", location);
   let sql = "SELECT * FROM `property` WHERE `location` = ?";
   pool.query(sql, [location], (err, result) => {
     console.log("SQL query", sql);
@@ -282,7 +297,6 @@ app.get("/OwnerDash", (req, res) => {
 app.post("/Property", (req,res) => {
   let sql1 = "UPDATE "
   let sql2 = "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,'san jose')";
-  "
 });
 
 app.post("/Photos", upload.single("selectedFile"), (req, res) => {
@@ -298,6 +312,6 @@ app.post("/Photos", upload.single("selectedFile"), (req, res) => {
 });
 
 //start your server on port 3001
-app.use(express.static(path.join(__dirname, "images")));
+app.use(serveStatic(path.join(__dirname, "images")));
 app.listen(3001);
 console.log("Server Listening on port 3001");

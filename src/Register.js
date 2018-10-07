@@ -57,7 +57,7 @@ class Register extends Component {
           <Header />
           <h2>Sign up for HomeAway</h2>
           <p>
-            Already have an account?
+            Already have an account?&nbsp;
             <Link to="/Home" onClick={this.handleLogin}>
               Login
             </Link>

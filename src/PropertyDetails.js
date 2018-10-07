@@ -172,7 +172,7 @@ class PropertyDetails extends Component {
           type="button"
           className="request-book main-btn"
         >
-          Request to Book
+          Book Now
         </button>
       </div>
     );

@@ -20,14 +20,15 @@ class Search extends Component {
     this.state = {
       dropdownIsOpen: false,
       service: null,
-      startDate: props.query.startDate,
-      endDate: props.query.endDate,
+      startDate: null,
+      endDate: null,
       guests: {
         adults: 1,
         children: 0,
         pets: false
       },
-      location: null
+      location: null,
+      location_name: null
     };
   }
   componentDidMount() {
@@ -47,8 +48,10 @@ class Search extends Component {
   };
   onChange = () => {
     this.state.service.addListener("place_changed", () => {
-      const location = this.state.service.getPlace().place_id;
-      this.setState({ location });
+      let place = this.state.service.getPlace();
+      let location = place.location;
+      let location_name = place.formatted_address;
+      this.setState({ location, location_name });
     });
   };
   updateAdultGuests = i => {
@@ -65,7 +68,7 @@ class Search extends Component {
     };
     this.setState({ guests });
   };
-  openDropdown = () =>
+  toggleDropdown = () =>
     this.setState({ dropdownIsOpen: !this.state.dropdownIsOpen });
   onClickSearch = () => {
     const { location, startDate, endDate, guests } = this.state;
@@ -82,14 +85,15 @@ class Search extends Component {
       startDate,
       endDate,
       focusedInput,
-      dropdownIsOpen
+      dropdownIsOpen,
     } = this.state;
+    const { query } = this.props;
     return (
       <div className="search">
         <input
           className="location-search"
           ref={this.input}
-          placeholder="Where do you want to go?"
+          placeholder={`${query.location_name !== undefined ? query.location_name : "Where do you want to go?"}`}
           onChange={() => this.onChange()}
         />
         <div className="v-line" />
@@ -98,8 +102,8 @@ class Search extends Component {
           startDateId="listing_header_start_date" // PropTypes.string.isRequired,
           endDate={endDate} // momentPropTypes.momentObj or null,
           endDateId="listing_header_end_date" // PropTypes.string.isRequired,
-          startDatePlaceholderText="Arrive"
-          endDatePlaceholderText="Depart"
+          startDatePlaceholderText={query.startDate === null ? "Arrive": moment(query.startDate).format("YYYY-MM-DD")}
+          endDatePlaceholderText={query.endDate === null ? "Depart": moment(query.endDate).format("YYYY-MM-DD")}
           onDatesChange={({ startDate, endDate }) =>
             this.setState({ startDate, endDate })
           } // PropTypes.func.isRequired,
@@ -111,11 +115,11 @@ class Search extends Component {
           <button
             type="button"
             className="guest-selector"
-            onClick={this.openDropdown}
+            onClick={this.toggleDropdown}
           >{`${guests.adults + guests.children} Guest${
             guests.adults + guests.children > 1 ? "s" : ""
-          } ${guests.pets ? ", Pets" : ""}`}</button>
-          <Dropdown isOpen={dropdownIsOpen} onClick={() => this.openDropdown()}>
+            } ${guests.pets ? ", Pets" : ""}`}</button>
+          <Dropdown isOpen={dropdownIsOpen} onClick={() => this.toggleDropdown()}>
             <p>Adults:</p>
             <Counter min={1} onIncrement={i => this.updateAdultGuests(i)} />
             <p>Children:</p>
@@ -137,7 +141,7 @@ class Search extends Component {
               }
             />
             <div className="button-group">
-              <button type="button" className="apply-guests">
+              <button type="button" className="apply-guests" onClick={() => this.toggleDropdown()}>
                 Apply
               </button>
             </div>
@@ -153,7 +157,7 @@ class Search extends Component {
 }
 
 Search.defaultProps = {
-  onClick: () => {},
+  onClick: () => { },
   query: {
     startDate: null,
     endDate: null

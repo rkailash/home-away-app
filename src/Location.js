@@ -87,7 +87,7 @@ class Location extends React.Component {
                 }
                 id="country"
                 type="text"
-                className="form-control"
+                className="form-control small"
               />
             </div>
             <div className="form-group">
@@ -134,7 +134,7 @@ class Location extends React.Component {
                   autoFocus
                   id="city"
                   type="text"
-                  className="form-control"
+                  className="form-control small"
                   placeholder=""
                   autoComplete="off"
                   ref={this.input}
@@ -161,7 +161,7 @@ class Location extends React.Component {
                 ref={this.st}
                 id="state"
                 type="text"
-                className="form-control"
+                className="form-control small"
                 onChange={() =>
                   this.setState({
                     values: {
@@ -180,7 +180,7 @@ class Location extends React.Component {
                 ref={this.pcode}
                 id="postal"
                 type="text"
-                className="form-control"
+                className="form-control small"
                 onChange={() =>
                   this.setState({
                     values: {

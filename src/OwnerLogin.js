@@ -37,8 +37,8 @@ class OwnerLogin extends Component {
 
       if (response.status === 200) {
         console.log("Login successful");
+        this.props.setUserInfo(response.data);
         this.setState({ authFlag: true });
-        console.log(response);
       } else {
         console.log("Login unsuccessful!");
         this.setState({ authFlag: false });
@@ -52,11 +52,18 @@ class OwnerLogin extends Component {
   */
     if (this.state.signUpFlag === true) return <Redirect to="/Register" />;
     else if (this.state.authFlag === true && cookie.load("user_cookie")) {
-      return <Redirect to="/Owner" />;
+      return <Redirect to={{
+        pathname: "/",
+        state: {
+          referrer: {
+            
+          }
+        }
+      }} />;
     } else {
       return (
         <div className="owner-login">
-          <Header />
+          <Header hideLyp />
           <div className="container">
             <img
               className="banner"

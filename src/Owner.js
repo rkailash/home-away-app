@@ -8,10 +8,10 @@ import Header from "./Header";
 import "styles/owner.scss";
 
 const navList = [
-  { value: "location", label: "Location" },
-  { value: "details", label: "Details" },
-  { value: "photos", label: "Photos" },
-  { value: "pricing", label: "Pricing" }
+  { value: "location", label: "Location", imgUrl: '/placeholder.svg' },
+  { value: "details", label: "Details", imgUrl: '/edit.svg' },
+  { value: "photos", label: "Photos", imgUrl: '/photo.svg' },
+  { value: "pricing", label: "Pricing", imgUrl: '/hand.svg' }
 ];
 
 const NextButton = ({ onClickNext }) => (
@@ -112,16 +112,16 @@ class Owner extends Component {
     const { activeNav } = this.state;
     return (
       <div className="owner-container">
-        <Header />
         <div className="form-box">
           <ul className="nav-list">
             {navList.map((item, key) => (
               <li
                 key={key}
-                className={item.value === activeNav ? "active" : ""}
+                className={`${item.value === activeNav ? "active" : ""}`}
                 onClick={() => this.setState({ activeNav: item.value })}
               >
-                {item.label}
+                <img src={`/images/${item.imgUrl}`} alt={item.value} title={item.value} />
+                <span>{item.label}</span>
               </li>
             ))}
           </ul>

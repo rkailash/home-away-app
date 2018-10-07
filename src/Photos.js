@@ -18,6 +18,7 @@ class Photos extends React.Component {
     return (
       <div className="layout">
         <div className="panel panel-default">
+        {this.props.onClickNextButton()}
           <h2>Add up to 50 photos of your property</h2>
           <hr />
           <div>

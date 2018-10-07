@@ -43,34 +43,40 @@ class Listing extends Component {
     const { items } = this.props.location.state.referrer;
     return (
       <div className="listing">
-        <Header />
-        <Search query={this.props.query} />
-        {items.map((item, key) => (
-          <div className="list-item" key={key}>
-            <ImageGallery showThumbnail={false} images={images} />
-            <div className="right-container">
-              <div className="top-container">
-                <Link to={`/Property/${item.propertyid}`}>
-                  <h4>{item.name}</h4>
-                </Link>
-                <div className="property-info">
-                  <span>{`${
-                    item.bedrooms === 0
-                      ? "Studio"
-                      : `${item.bedrooms} BR Apartment`
-                  }`}</span>
-                  <span>{`${item.bathrooms} Bath`}</span>
-                  <span>{`${item.area} sq ft`}</span>
-                  <span>{`Sleeps ${item.sleeps}`}</span>
+        <div className="top-container">
+          <Header />
+          <Search query={this.props.query} />
+          >
+        </div>
+        <div className="list-container">
+          <h4>{`We found ${items.length} result${items.length === 1 ? '' : "s"} for you.`}</h4>
+          {items.map((item, key) => (
+            <div className="list-item" key={key}>
+              <ImageGallery showThumbnail={false} images={images} />
+              <div className="right-container">
+                <div className="top-container">
+                  <Link to={`/Property/${item.propertyid}`}>
+                    <h4>{item.name}</h4>
+                  </Link>
+                  <div className="property-info">
+                    <span>{`${
+                      item.bedrooms === 0
+                        ? "Studio"
+                        : `${item.bedrooms} BR Apartment`
+                      }`}</span>
+                    <span>{`${item.bathrooms} Bath`}</span>
+                    <span>{`${item.area} sq ft`}</span>
+                    <span>{`Sleeps ${item.sleeps}`}</span>
+                  </div>
+                </div>
+                <div className="bottom-strip">
+                  <p>{`$${item.price} per night`}</p>
+                  <RatingDisplay rating={item.rating} />
                 </div>
               </div>
-              <div className="bottom-strip">
-                <p>{`$${item.price} per night`}</p>
-                <RatingDisplay rating={item.rating} />
-              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   }

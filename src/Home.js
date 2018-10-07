@@ -6,6 +6,7 @@ import Header from "./Header";
 import "styles/home.scss";
 import { Redirect } from "react-router-dom";
 import { userInfo } from "os";
+import moment from 'moment';
 
 class Home extends Component {
   constructor(props) {
@@ -16,12 +17,18 @@ class Home extends Component {
     };
   }
   onClickSearch = query => {
-    console.log("Inside click");
-    this.props.saveSearchQuery({ query })
+    this.props.saveSearchQuery({ query });
+    const startDate = moment(query.startDate).format("YYYY-MM-DD");
+    const endDate = moment(query.startDate).format("YYYY-MM-DD");
     axios.defaults.withCredentials = true;
-
     axios
-      .get(`http://localhost:3001/PropertyList?location=san%20jose`)
+      .get(`http://localhost:3001/PropertyList`, {
+        params: {
+          location: 'san jose',
+          startDate,
+          endDate
+        }
+      })
       .then(response => {
         console.log("Axios POST response:", response.status);
         if (response.status === 200) {

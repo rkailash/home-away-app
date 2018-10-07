@@ -1,0 +1,22 @@
+@import "constants.scss";
+
+.od {
+  overflow: hidden;
+  .header {
+    position: fixed;
+    width: 100%;
+  }
+  .top-container {
+    padding-top: 72px;
+  }
+  .header-menu.dropdown {
+    border-left: 1px solid $offwhite;
+    border-right: 1px solid $offwhite;
+    width: 200px;
+    .dropdown-toggle {
+      padding-left: 0;
+      padding-right: 0;
+      width: 100%;
+    }
+  }
+}
