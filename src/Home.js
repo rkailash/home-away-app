@@ -6,25 +6,25 @@ import Header from "./Header";
 import "styles/home.scss";
 import { Redirect } from "react-router-dom";
 import { userInfo } from "os";
-import moment from 'moment';
+import moment from "moment";
 
 class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
       goToListing: false,
-      items: [],
+      items: []
     };
   }
   onClickSearch = query => {
-    this.props.saveSearchQuery({ query });
+    this.props.saveSearchQuery(query);
     const startDate = moment(query.startDate).format("YYYY-MM-DD");
     const endDate = moment(query.startDate).format("YYYY-MM-DD");
     axios.defaults.withCredentials = true;
     axios
       .get(`http://localhost:3001/PropertyList`, {
         params: {
-          location: 'san jose',
+          location: "san jose",
           startDate,
           endDate
         }

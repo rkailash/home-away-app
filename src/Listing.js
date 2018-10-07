@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import ImageGallery from "templates/ImageGallery";
 import RatingDisplay from "templates/RatingDisplay";
 import { Link } from "react-router-dom";
-import Header from './Header';
-import Search from './Search';
+import Header from "./Header";
+import Search from "./Search";
 import "styles/listing.scss";
 
 const images = [
@@ -44,12 +44,13 @@ class Listing extends Component {
     return (
       <div className="listing">
         <div className="top-container">
-          <Header />
-          <Search query={this.props.query} />
-          >
+          <Header showLogin />
+          <Search query={this.props.query} />>
         </div>
         <div className="list-container">
-          <h4>{`We found ${items.length} result${items.length === 1 ? '' : "s"} for you.`}</h4>
+          <h4>{`We found ${items.length} result${
+            items.length === 1 ? "" : "s"
+          } for you.`}</h4>
           {items.map((item, key) => (
             <div className="list-item" key={key}>
               <ImageGallery showThumbnail={false} images={images} />
@@ -63,7 +64,7 @@ class Listing extends Component {
                       item.bedrooms === 0
                         ? "Studio"
                         : `${item.bedrooms} BR Apartment`
-                      }`}</span>
+                    }`}</span>
                     <span>{`${item.bathrooms} Bath`}</span>
                     <span>{`${item.area} sq ft`}</span>
                     <span>{`Sleeps ${item.sleeps}`}</span>

@@ -14,8 +14,8 @@ import Register from "./Register";
 import PropertyDetails from "./PropertyDetails";
 import TravelerDashboard from "./TravelerDashboard";
 import OwnerDashboard from "./OwnerDashboard";
-import Logout from './Logout';
-import Error from './Error'
+import Logout from "./Logout";
+import Error from "./Error";
 import { userInfo } from "os";
 
 class App extends Component {
@@ -31,16 +31,62 @@ class App extends Component {
     return (
       <div>
         <Switch>
-          <Route exact path="/" render={() => (<Home userInfo={userInfo} saveSearchQuery={(searchQuery) => this.setState({ searchQuery })} />)} />
-          <Route path="/TravellerLogin" render={() => (<Login setUserInfo={(userInfo) => this.setState({ userInfo })} />)} />
-          <Route path="/OwnerLogin" render={(props) => (<OwnerLogin {...[props]} setUserInfo={(userInfo) => this.setState({ userInfo })} />)} />
+          <Route
+            exact
+            path="/"
+            render={() => (
+              <Home
+                userInfo={userInfo}
+                saveSearchQuery={searchQuery => this.setState({ searchQuery })}
+              />
+            )}
+          />
+          <Route
+            path="/TravellerLogin"
+            render={() => (
+              <Login setUserInfo={userInfo => this.setState({ userInfo })} />
+            )}
+          />
+          <Route
+            path="/OwnerLogin"
+            render={props => (
+              <OwnerLogin
+                {...[props]}
+                setUserInfo={userInfo => this.setState({ userInfo })}
+              />
+            )}
+          />
           <Route path="/Register" component={Register} />
           <Route path="/Owner" component={Owner} />
-          <Route path="/Listing" render={(props) => (<Listing {...props} query={searchQuery} />)} />
-          <Route path="/Property" render={(props) => (<Property {...props} query={searchQuery} />)} />
-          <Route path="/Traveler" render={(props) => (<TravelerDashboard {...props} userInfo={userInfo} />)} />
-          <Route path="/od" render={(props) => (<OwnerDashboard {...props} userInfo={userInfo} />)} />
-          <Route path="/Logout" render={(props) => <Logout {...props} setUserInfo={(userInfo) => this.setState({ userInfo })} />} />
+          <Route
+            path="/Listing"
+            render={props => <Listing {...props} query={searchQuery} />}
+          />
+          <Route
+            path="/Property"
+            render={props => (
+              <Property {...props} userInfo={userInfo} query={searchQuery} />
+            )}
+          />
+          <Route
+            path="/Traveler"
+            render={props => (
+              <TravelerDashboard {...props} userInfo={userInfo} />
+            )}
+          />
+          <Route
+            path="/od"
+            render={props => <OwnerDashboard {...props} userInfo={userInfo} />}
+          />
+          <Route
+            path="/Logout"
+            render={props => (
+              <Logout
+                {...props}
+                setUserInfo={userInfo => this.setState({ userInfo })}
+              />
+            )}
+          />
           <Route component={Error} />
         </Switch>
       </div>

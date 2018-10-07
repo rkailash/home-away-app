@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import ImageGallery from "templates/ImageGallery";
 import axios from "axios";
 import PropertyDetails from "./PropertyDetails";
-import Header from './Header';
-import Search from './Search';
+import Header from "./Header";
+import Search from "./Search";
+import moment from "moment";
 import "styles/productPage.scss";
 
 const images = [
@@ -72,14 +73,33 @@ class Property extends Component {
     this.setState({ isFullScreen: false });
   };
   onBook = () => {
-    axios.post("");
+    const data = {
+      propertyid: this.props.location.pathname.split("Property/")[1],
+      startdate: moment(this.props.query.startDate).format("YYYY-MM-DD"),
+      enddate: moment(this.props.query.endDate).format("YYYY-MM-DD")
+    };
+
+    console.log(data);
+    axios.post("http://localhost:3001/Booking", data).then(response => {
+      console.log("Axios POST response:", response.status);
+
+      if (response.status === 200) {
+        this.setState({ authFlag: true });
+        this.props.setUserInfo(response.data);
+      } else {
+        console.log("Login unsuccessful!");
+        this.setState({ authFlag: false });
+      }
+    });
   };
+
   render() {
     const { propertyDetails, isFullScreen, currentImagePos } = this.state;
+    console.log(this.props.userInfo);
     return (
       <div className="product-page">
         <div className="headers">
-          <Header />
+          <Header showLogin />
           <Search query={this.props.query} />
         </div>
         <div className="top-container">
@@ -92,11 +112,11 @@ class Property extends Component {
           {propertyDetails === undefined ? (
             <div className="loading">Loading...</div>
           ) : (
-              <PropertyDetails
-                item={propertyDetails}
-                onClickBook={() => this.onBook()}
-              />
-            )}
+            <PropertyDetails
+              item={propertyDetails}
+              onClickBook={() => this.onBook()}
+            />
+          )}
         </div>
         {isFullScreen && (
           <div className="fullscreen-gallery">
@@ -104,16 +124,25 @@ class Property extends Component {
             <button
               type="button"
               className="close-gallery"
-              onClick={() => this.closeFullScreen()}>
-              <svg id="Capa_1" viewBox="0 0 212.982 212.982" width="16px" height="16px">
-              <g id="Close">
-              <path style={{fillRule:"evenodd", clipRule:"evenodd"}} d="M131.804,106.491l75.936-75.936c6.99-6.99,6.99-18.323,0-25.312   c-6.99-6.99-18.322-6.99-25.312,0l-75.937,75.937L30.554,5.242c-6.99-6.99-18.322-6.99-25.312,0c-6.989,6.99-6.989,18.323,0,25.312   l75.937,75.936L5.242,182.427c-6.989,6.99-6.989,18.323,0,25.312c6.99,6.99,18.322,6.99,25.312,0l75.937-75.937l75.937,75.937   c6.989,6.99,18.322,6.99,25.312,0c6.99-6.99,6.99-18.322,0-25.312L131.804,106.491z" fill="#ccc" />
-            </g>
+              onClick={() => this.closeFullScreen()}
+            >
+              <svg
+                id="Capa_1"
+                viewBox="0 0 212.982 212.982"
+                width="16px"
+                height="16px"
+              >
+                <g id="Close">
+                  <path
+                    style={{ fillRule: "evenodd", clipRule: "evenodd" }}
+                    d="M131.804,106.491l75.936-75.936c6.99-6.99,6.99-18.323,0-25.312   c-6.99-6.99-18.322-6.99-25.312,0l-75.937,75.937L30.554,5.242c-6.99-6.99-18.322-6.99-25.312,0c-6.989,6.99-6.989,18.323,0,25.312   l75.937,75.936L5.242,182.427c-6.989,6.99-6.989,18.323,0,25.312c6.99,6.99,18.322,6.99,25.312,0l75.937-75.937l75.937,75.937   c6.989,6.99,18.322,6.99,25.312,0c6.99-6.99,6.99-18.322,0-25.312L131.804,106.491z"
+                    fill="#ccc"
+                  />
+                </g>
               </svg>
-          </button>
+            </button>
           </div>
-    )
-  }
+        )}
       </div>
     );
   }

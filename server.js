@@ -11,7 +11,7 @@ const path = require("path");
 const mysql = require("mysql");
 const fs = require("fs");
 const bcrypt = require("bcrypt");
-var serveStatic = require('serve-static')
+var serveStatic = require("serve-static");
 const saltRounds = 10;
 
 app.set("view engine", "ejs");
@@ -100,14 +100,14 @@ app.post("/Login", (req, res) => {
 app.get("/Logout", (req, res) => {
   if (req.session) {
     req.session.destroy(function(err) {
-      if(err) {
-        return res.end('Unable to logout');
+      if (err) {
+        return res.end("Unable to logout");
       } else {
-        return res.end('Logout Successful');
+        return res.end("Logout Successful");
       }
     });
   }
-})
+});
 
 app.post("/Register", (request, response) => {
   console.log("Inside Register POST request");
@@ -294,9 +294,10 @@ app.get("/OwnerDash", (req, res) => {
   });
 });
 
-app.post("/Property", (req,res) => {
-  let sql1 = "UPDATE "
-  let sql2 = "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,'san jose')";
+app.post("/Property", (req, res) => {
+  let sql1 = "UPDATE ";
+  let sql2 =
+    "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,'san jose')";
 });
 
 app.post("/Photos", upload.single("selectedFile"), (req, res) => {
@@ -311,7 +312,45 @@ app.post("/Photos", upload.single("selectedFile"), (req, res) => {
   }
 });
 
+app.post("/Booking", (req, res) => {
+  console.log("Inside booking:", req.body);
+
+  let startDate = req.body.startdate;
+  let endDate = req.body.enddate;
+  let propertyId = req.body.propertyid;
+  let userId = req.session.userid;
+  let sql1 = "SELECT ownerid FROM property WHERE propertyid =?";
+  let sql2 =
+    "INSERT INTO booking (`bookingid`,`propertyid`,`userid`,`ownerid`,`startdate`, `enddate`) VALUES (NULL,?,?,?,?,?)";
+  let sql3 = "UPDATE property SET bookedflag=1 WHERE propertyid=?";
+  pool.query(sql1, [propertyId], (err, result) => {
+    if (err) {
+      throw err;
+    } else {
+      console.log(result[0].ownerid);
+      let OWNERID = result[0].ownerid;
+      pool.query(
+        sql2,
+        [propertyId, userId, OWNERID, startDate, endDate],
+        (err, result1) => {
+          if (err) throw err;
+          else {
+            console.log(result1);
+            pool.query(sql3, [propertyId], (err, result2) => {
+              if (err) throw err;
+              else console.log(result2);
+            });
+          }
+        }
+      );
+    }
+  });
+});
+
 //start your server on port 3001
 app.use(serveStatic(path.join(__dirname, "images")));
-app.listen(3001);
-console.log("Server Listening on port 3001");
+app.listen(3001, () => {
+  console.log("Server Listening on port 3001");
+});
+
+// ("SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.ownerid=?")
