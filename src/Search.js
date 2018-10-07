@@ -8,7 +8,7 @@ import Select from "react-select";
 import Counter from "templates/Counter";
 import RadioGroup from "templates/RadioGroup";
 import Dropdown from "templates/Dropdown";
-import moment from 'moment';
+import moment from "moment";
 import "react-dates/initialize";
 import "react-dates/lib/css/_datepicker.css";
 import "styles/search.scss";
@@ -70,7 +70,10 @@ class Search extends Component {
   onClickSearch = () => {
     const { location, startDate, endDate, guests } = this.state;
     this.props.onClick({
-      location, startDate, endDate, guests
+      location,
+      startDate,
+      endDate,
+      guests
     });
   };
   render() {
@@ -81,7 +84,6 @@ class Search extends Component {
       focusedInput,
       dropdownIsOpen
     } = this.state;
-    console.log('startDate', startDate);
     return (
       <div className="search">
         <input

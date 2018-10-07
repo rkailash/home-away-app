@@ -80,7 +80,7 @@ class Header extends Component {
             </Dropdown>
           )}
           <button type="button" className="lyp">
-            List your Property
+            <Link to="/Owner">List your Property</Link>
           </button>
           <img
             className="logo-image"

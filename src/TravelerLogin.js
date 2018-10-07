@@ -9,7 +9,7 @@ class Login extends Component {
   state = {
     account: { email: "", password: "" },
     authFlag: false,
-    signUpFlag: false,
+    signUpFlag: false
   };
 
   handleChange = e => {
@@ -32,7 +32,8 @@ class Login extends Component {
 
       if (response.status === 200) {
         this.setState({ authFlag: true });
-        this.props.setUserInfo(response.data[0]);
+        this.props.setUserInfo(response.data);
+        console.log(response.data);
       } else {
         console.log("Login unsuccessful!");
         this.setState({ authFlag: false });

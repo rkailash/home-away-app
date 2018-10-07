@@ -167,7 +167,11 @@ class PropertyDetails extends Component {
             </button>
           </div>
         </div>
-        <button type="button" className="request-book main-btn">
+        <button
+          onClick={() => this.props.onClickBook()}
+          type="button"
+          className="request-book main-btn"
+        >
           Request to Book
         </button>
       </div>

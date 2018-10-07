@@ -69,6 +69,9 @@ class Property extends Component {
   closeFullScreen = () => {
     this.setState({ isFullScreen: false });
   };
+  onBook = () => {
+    axios.post("");
+  };
   render() {
     const { propertyDetails } = this.state;
     return (
@@ -83,7 +86,10 @@ class Property extends Component {
           {propertyDetails === undefined ? (
             <div className="loading">Loading...</div>
           ) : (
-            <PropertyDetails item={propertyDetails} />
+            <PropertyDetails
+              item={propertyDetails}
+              onClickBook={() => this.onBook()}
+            />
           )}
         </div>
         {this.state.isFullScreen && (

@@ -10,7 +10,7 @@ const uuidv4 = require("uuid/v4");
 const path = require("path");
 const mysql = require("mysql");
 const fs = require("fs");
-// const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 app.set("view engine", "ejs");
@@ -62,8 +62,8 @@ app.post("/Login", (req, res) => {
   console.log("Inside Login POST request");
   let email = req.body.email;
   let password = req.body.password;
-  let sql = "SELECT * FROM `users` WHERE `email` = ? AND `password` = ?";
-  pool.query(sql, [email, password], (err, result) => {
+  let sql = "SELECT * FROM `users` WHERE `email` = ?";
+  pool.query(sql, [email], (err, result) => {
     if (err) {
       console.log("Email not found in database");
       throw err;
@@ -73,35 +73,25 @@ app.post("/Login", (req, res) => {
       res.end("Email not found. Please sign up!");
     } else {
       console.log("SQL result", result);
-      // bcrypt.compare(password, result[0].password, (err, hash) => {
-      //   console.log("Inside compare..");
-      //   if (err) throw err;
-      //   if (hash == true) {
-      //     console.log("hash is true");
-      //     res.cookie("user_cookie", "admin", {
-      //       maxAge: 900000,
-      //       httpOnly: false,
-      //       path: "/"
-      //     });
-      //     req.session.userid = result[0].userid;
-      //     res.writeHead(200, {
-      //       "Content-Type": "text/plain"
-      //     });
-      //     res.end("Successful Login");
-      //   } else {
-      //     console.log("Passwords don't match");
-      //   }
-      // });
-      res.cookie("user_cookie", "admin", {
-        maxAge: 900000,
-        httpOnly: false,
-        path: "/"
+      bcrypt.compare(password, result[0].password, (err, hash) => {
+        console.log("Inside compare..");
+        if (err) throw err;
+        if (hash == true) {
+          console.log("hash is true");
+          res.cookie("user_cookie", "admin", {
+            maxAge: 900000,
+            httpOnly: false,
+            path: "/"
+          });
+          req.session.userid = result[0].userid;
+          res.writeHead(200, {
+            "Content-Type": "application/json"
+          });
+          res.end(JSON.stringify(result[0]));
+        } else {
+          console.log("Passwords don't match");
+        }
       });
-      req.session.userid = result[0].userid;
-      res.writeHead(200, {
-        "Content-Type": "text/plain"
-      });
-      res.end(JSON.stringify(result));
     }
   });
 });
@@ -248,10 +238,53 @@ app.get("/Property/:id", (req, res) => {
 });
 
 app.get("/TDash", (req, res) => {
+  let userId = req.session.userid;
+  let sql = "SELECT * from `booking` WHERE `userid` = ?";
   console.log("Traveller dashboard");
+  pool.query(sql, [userId], (err, result) => {
+    if (err) {
+      throw err;
+      res.writeHead(400, {
+        "Content-Type": "text/plain"
+      });
+      res.end("No search results returned");
+    } else {
+      res.writeHead(200, {
+        "Content-Type": "application/json"
+      });
+      res.end(JSON.stringify(result));
+      console.log(result);
+    }
+  });
 });
 
-app.get("/OwnerDash", (req, res) => {});
+app.get("/OwnerDash", (req, res) => {
+  let ownerId = req.session.userid;
+  let sql =
+    "SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.ownerid=?";
+  pool.query(sql, [ownerId], (err, result) => {
+    if (err) {
+      throw err;
+      res.writeHead(400, {
+        "Content-Type": "text/plain"
+      });
+      res.end("No search results returned");
+    } else {
+      res.writeHead(200, {
+        "Content-Type": "application/json"
+      });
+      res.end(JSON.stringify(result));
+      console.log(result);
+    }
+  });
+});
+
+app.post("/Property", (req,res) => {
+  let sql1 = "UPDATE "
+  let sql2 = "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,'san jose')";
+  "
+});
+
 app.post("/Photos", upload.single("selectedFile"), (req, res) => {
   if (!req.file) {
     console.log("No file received");
