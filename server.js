@@ -166,11 +166,11 @@ app.post("/Register", (request, response) => {
 app.post("/Owner", (req, res) => {
   console.log("Inside Owner POST request");
   let ownerId = req.session.userid;
-  let name = req.body.headline;
-  let sleeps = req.body.sleeps;
-  let bathrooms = req.body.bathrooms;
-  let bedrooms = req.body.bedrooms;
-  let type = req.body.type;
+  let name = req.body.details.headline;
+  let sleeps = req.body.details.accomodates;
+  let bathrooms = req.body.details.bathrooms;
+  let bedrooms = req.body.details.bedrooms;
+  let type = req.body.details.type;
   let price = req.body.price;
   let location = req.body.location;
   let sql =
@@ -288,6 +288,7 @@ app.get("/Trips", (req, res) => {
 app.get("/OwnerDash", (req, res) => {
   let ownerId = req.session.userid;
   let sql = "SELECT * FROM `property` WHERE ownerid = ?";
+  console.log("Fetching Owner Dashboard of Owner ID", ownerId);
   pool.query(sql, [ownerId], (err, result) => {
     if (err) {
       throw err;
@@ -299,6 +300,7 @@ app.get("/OwnerDash", (req, res) => {
       res.writeHead(200, {
         "Content-Type": "application/json"
       });
+      console.log("Result is ", result);
       res.end(JSON.stringify(result));
     }
   });
