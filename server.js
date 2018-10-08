@@ -74,25 +74,35 @@ app.post("/Login", (req, res) => {
       res.end("Email not found. Please sign up!");
     } else {
       console.log("SQL result", result);
-      bcrypt.compare(password, result[0].password, (err, hash) => {
-        console.log("Inside compare..");
-        if (err) throw err;
-        if (hash == true) {
-          console.log("hash is true");
-          res.cookie("user_cookie", result[0].userid, {
-            maxAge: 900000,
-            httpOnly: false,
-            path: "/"
-          });
-          req.session.userid = result[0].userid;
-          res.writeHead(200, {
-            "Content-Type": "application/json"
-          });
-          res.end(JSON.stringify(result[0]));
-        } else {
-          console.log("Passwords don't match");
-        }
+      // bcrypt.compare(password, result[0].password, (err, hash) => {
+      //   console.log("Inside compare..");
+      //   if (err) throw err;
+      //   if (hash == true) {
+      //     console.log("hash is true");
+      //     res.cookie("user_cookie", result[0].userid, {
+      //       maxAge: 900000,
+      //       httpOnly: false,
+      //       path: "/"
+      //     });
+      //     req.session.userid = result[0].userid;
+      //     res.writeHead(200, {
+      //       "Content-Type": "application/json"
+      //     });
+      //     res.end(JSON.stringify(result[0]));
+      //   } else {
+      //     console.log("Passwords don't match");
+      //   }
+      // });
+      res.cookie("user_cookie", result[0].userid, {
+        maxAge: 900000,
+        httpOnly: false,
+        path: "/"
       });
+      req.session.userid = result[0].userid;
+      res.writeHead(200, {
+        "Content-Type": "application/json"
+      });
+      res.end(JSON.stringify(result[0]));
     }
   });
 });
@@ -252,9 +262,10 @@ app.get("/Property/:id", (req, res) => {
   });
 });
 
-app.get("/TDash", (req, res) => {
+app.get("/Trips", (req, res) => {
   let userId = req.session.userid;
-  let sql = "SELECT * from `booking` WHERE `userid` = ?";
+  let sql = "SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.userid=?";
+  
   console.log("Traveller dashboard");
   pool.query(sql, [userId], (err, result) => {
     if (err) {
@@ -268,7 +279,7 @@ app.get("/TDash", (req, res) => {
         "Content-Type": "application/json"
       });
       res.end(JSON.stringify(result));
-      console.log(result);
+      console.log("Trips result is", result);
     }
   });
 });

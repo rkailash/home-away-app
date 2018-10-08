@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
 import axios from "axios";
 import cookie from "react-cookies";
+import { Button, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 import Header from "./Header";
 import "styles/login.scss";
 
@@ -9,9 +10,14 @@ class Login extends Component {
   state = {
     account: { email: "", password: "" },
     authFlag: false,
-    signUpFlag: false
+    signUpFlag: false,
+    showEmailError: false,
+    showLoginError: false
   };
-
+  validateEmail = email => {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  }
   handleChange = e => {
     const account = { ...this.state.account };
     account[e.currentTarget.name] = e.currentTarget.value;
@@ -24,20 +30,22 @@ class Login extends Component {
     console.log("Inside handlesubmit method");
 
     const data = { ...this.state.account };
+    if(this.validateEmail(data.email)) {
+      axios.defaults.withCredentials = true;
+      axios.post("http://localhost:3001/Login", data).then(response => {
+        console.log("Axios POST response:", response.status);
 
-    axios.defaults.withCredentials = true;
-
-    axios.post("http://localhost:3001/Login", data).then(response => {
-      console.log("Axios POST response:", response.status);
-
-      if (response.status === 200) {
-        this.setState({ authFlag: true });
-        this.props.setUserInfo(response.data);
-      } else {
-        console.log("Login unsuccessful!");
-        this.setState({ authFlag: false });
-      }
-    });
+        if (response.status === 200) {
+          this.setState({ authFlag: true });
+          this.props.setUserInfo(response.data);
+        } else {
+          console.log("Login unsuccessful!");
+          this.setState({ authFlag: false });
+        }
+      });
+    } else {
+      this.setState({ showEmailError: true });
+    }
   };
 
   handleSignUp = e => {
@@ -45,7 +53,7 @@ class Login extends Component {
     this.setState({ signUpFlag: true });
   };
   render() {
-    const { account, userInfo } = this.state;
+    const { account, userInfo, showEmailError } = this.state;
     const { title } = this.props;
     if (this.state.signUpFlag) return <Redirect to="/Register" />;
     if (this.state.authFlag && cookie.load("user_cookie")) {
@@ -63,15 +71,23 @@ class Login extends Component {
           </p>
           <form onSubmit={this.handleSubmit}>
             <h3>Account Login</h3>
-            <input
-              autoFocus
-              tabIndex={1}
-              type="email"
-              name="email"
-              placeholder="Email address"
-              value={account.email}
-              onChange={this.handleChange}
-            />
+            <div>
+              <input
+                autoFocus
+                tabIndex={1}
+                type="email"
+                name="email"
+                placeholder="Email address"
+                value={account.email}
+                onChange={this.handleChange}
+                onFocus={() => this.setState({showEmailError: false})}
+                id="Popover1"
+              />
+              <Popover placement="right" isOpen={this.state.showEmailError} target="Popover1">
+                <PopoverHeader>Error</PopoverHeader>
+                <PopoverBody>Invalid email address.</PopoverBody>
+              </Popover>
+            </div>
             <input
               tabIndex={2}
               type="password"
@@ -89,6 +105,7 @@ class Login extends Component {
             >
               Log in
             </button>
+            {this.state.showLoginError && <small className="my-error">Email or password is incorrect.</small>}
           </form>
         </div>
       );

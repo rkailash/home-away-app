@@ -97,11 +97,11 @@ class PropertyDetails extends Component {
         <div className="user-selection">
           <DateRangePicker
             startDate={startDate} // momentPropTypes.momentObj or null,
-            startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
-            startDatePlaceholderText="Arrive"
-            endDatePlaceholderText="Depart"
+            startDateId="check_in" // PropTypes.string.isRequired,
+            startDatePlaceholderText="Check In"
+            endDatePlaceholderText="Check Out"
             endDate={endDate} // momentPropTypes.momentObj or null,
-            endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
+            endDateId="check_out" // PropTypes.string.isRequired,
             onDatesChange={({ startDate, endDate }) =>
               this.setState({ startDate, endDate })
             } // PropTypes.func.isRequired,
