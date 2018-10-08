@@ -105,7 +105,7 @@ class Property extends Component {
         </div>
         {isFullScreen && (
           <div className="fullscreen-gallery">
-            <ImageGallery images={images} openAt={currentImagePos} />
+            <ImageGallery images={images[userInfo.userid]} openAt={currentImagePos} />
             <button
               type="button"
               className="close-gallery"

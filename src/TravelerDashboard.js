@@ -56,7 +56,7 @@ const MyTrips = ({ trips, activeNav, setActiveNav, userInfo }) => {
             {
               trips.map((item, key) => (
                 <div className="list-item" key={key}>
-                  <ImageGallery showThumbnail={false} images={images[key]} />
+                  <ImageGallery showThumbnail={false} images={images[userInfo.userid]} />
                   <div className="right-container">
                     <div className="top-container">
                       <Link to={`/Property/${item.propertyid}`}>

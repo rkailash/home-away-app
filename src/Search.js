@@ -122,7 +122,7 @@ class Search extends Component {
           />
         </button>
         <div className="v-line" />
-        <div className="dropdown-group">
+        <div className="dropdown-group" onClick={() => this.setState({showError: false})}>
           <button
             type="button"
             className="guest-selector"

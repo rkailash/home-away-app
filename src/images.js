@@ -33,7 +33,7 @@ export const images = {
                 "https://odis.homeaway.com/odis/listing/87499f18-75d6-4637-86ed-b072d7ce5825.c10.jpg"
         }
     ],
-    "3": [
+    "2": [
         {
             key: "1",
             value: "https://odis.homeaway.com/odis/listing/1265d185-d92a-429e-a7d9-74ca30e22329.c10.jpg"
@@ -45,6 +45,20 @@ export const images = {
         {
             key: "3",
             value: "https://odis.homeaway.com/odis/listing/41737624-5cef-4ed1-ab9b-f083d96c0a09.c10.jpg"
+        },
+    ],
+    "3": [
+        {
+            key: "1",
+            value: "https://odis.homeaway.com/odis/listing/f85956a6-2236-4764-9fad-530386dcfc95.c10.jpg"
+        },
+        {
+            key: "2",
+            value: "https://odis.homeaway.com/odis/listing/1790009a-2aa2-4ccf-a4d3-cefee36df413.c10.jpg"
+        },
+        {
+            key: "3",
+            value: "https://odis.homeaway.com/odis/listing/90d8a19a-bb42-42e2-9703-a4237807a3ed.c10.jpg"
         },
     ]
 };

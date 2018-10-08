@@ -5,34 +5,7 @@ import { Link } from "react-router-dom";
 import Header from "./Header";
 import Search from "./Search";
 import "styles/listing.scss";
-
-const images = [
-  {
-    key: "1",
-    value:
-      "https://odis.homeaway.com/odis/listing/c64e4758-21ad-40c3-98f2-62343335315c.c10.jpg"
-  },
-  {
-    key: "2",
-    value:
-      "https://cdn1.caratlane.com/media/queldorei/shopper/revolution/Encircle_Hp-02-rc1-1600.jpg"
-  },
-  {
-    key: "3",
-    value:
-      "https://cdn13.caratlane.com/media/queldorei/shopper/revolution/BLUE-butterfly-banner_HP-rc1-1600.jpg"
-  },
-  {
-    key: "4",
-    value:
-      "https://cdn1.caratlane.com/media/queldorei/shopper/revolution/Save_Upto25_3-rc1-1600.jpg"
-  },
-  {
-    key: "5",
-    value:
-      "https://cdn13.caratlane.com/media/queldorei/shopper/revolution/RTS_Hp-rc1-1600.jpg"
-  }
-];
+import {images} from './images';
 
 class Listing extends Component {
   constructor(props) {
@@ -53,7 +26,7 @@ class Listing extends Component {
           } for you.`}</h4>
           {items.map((item, key) => (
             <div className="list-item" key={key}>
-              <ImageGallery showThumbnail={false} images={images} />
+              <ImageGallery showThumbnail={false} images={images[this.props.userInfo.userid]} />
               <div className="right-container">
                 <div className="top-container">
                   <Link to={`/Property/${item.propertyid}`}>
