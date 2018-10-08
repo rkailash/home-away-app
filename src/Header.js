@@ -110,6 +110,9 @@ class Header extends Component {
           />
         </Link>
         <div className="right-container">
+          {
+            userInfo !== undefined && <Link className="trips" to="/Traveler/trips">My Trips</Link>
+          }
           {showLogin && (
             <Dropdown
               className={`header-menu${userInfo === undefined ? '' : ' user-profile'}`}
