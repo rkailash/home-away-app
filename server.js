@@ -252,9 +252,10 @@ app.get("/Property/:id", (req, res) => {
   });
 });
 
-app.get("/TDash", (req, res) => {
+app.get("/Trips", (req, res) => {
   let userId = req.session.userid;
-  let sql = "SELECT * from `booking` WHERE `userid` = ?";
+  let sql =
+    "SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.userid=?";
   console.log("Traveller dashboard");
   pool.query(sql, [userId], (err, result) => {
     if (err) {
