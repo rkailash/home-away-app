@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
 import axios from "axios";
 import cookie from "react-cookies";
-import { Button, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
+import { Button, Popover, PopoverHeader, PopoverBody } from "reactstrap";
 import Header from "./Header";
 import "styles/login.scss";
 
@@ -12,12 +12,12 @@ class Login extends Component {
     authFlag: false,
     signUpFlag: false,
     showEmailError: false,
-    showLoginError: false
+    showLoginError: true
   };
   validateEmail = email => {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
-  }
+  };
   handleChange = e => {
     const account = { ...this.state.account };
     account[e.currentTarget.name] = e.currentTarget.value;
@@ -30,7 +30,8 @@ class Login extends Component {
     console.log("Inside handlesubmit method");
 
     const data = { ...this.state.account };
-    if(this.validateEmail(data.email)) {
+    if (this.validateEmail(data.email)) {
+      console.log("Data", data);
       axios.defaults.withCredentials = true;
       axios.post("http://localhost:3001/Login", data).then(response => {
         console.log("Axios POST response:", response.status);
@@ -40,7 +41,7 @@ class Login extends Component {
           this.props.setUserInfo(response.data);
         } else {
           console.log("Login unsuccessful!");
-          this.setState({ authFlag: false });
+          this.setState({ authFlag: false, showLoginError: true });
         }
       });
     } else {
@@ -80,10 +81,14 @@ class Login extends Component {
                 placeholder="Email address"
                 value={account.email}
                 onChange={this.handleChange}
-                onFocus={() => this.setState({showEmailError: false})}
+                onFocus={() => this.setState({ showEmailError: false })}
                 id="Popover1"
               />
-              <Popover placement="right" isOpen={this.state.showEmailError} target="Popover1">
+              <Popover
+                placement="right"
+                isOpen={this.state.showEmailError}
+                target="Popover1"
+              >
                 <PopoverHeader>Error</PopoverHeader>
                 <PopoverBody>Invalid email address.</PopoverBody>
               </Popover>
@@ -105,7 +110,11 @@ class Login extends Component {
             >
               Log in
             </button>
-            {this.state.showLoginError && <small className="my-error">Email or password is incorrect.</small>}
+            {this.state.showLoginError && (
+              <small className="my-error">
+                Email or password is incorrect.
+              </small>
+            )}
           </form>
         </div>
       );

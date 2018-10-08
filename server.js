@@ -60,11 +60,15 @@ app.use(function(req, res, next) {
 });
 
 app.post("/Login", (req, res) => {
-  console.log("Inside Login POST request");
+  console.log("Inside Login request");
+  console.log(req.body);
   let email = req.body.email;
   let password = req.body.password;
+  console.log(email, password);
   let sql = "SELECT * FROM `users` WHERE `email` = ?";
   pool.query(sql, [email], (err, result) => {
+    console.log("Password:", password);
+    console.log("SQL", result);
     if (err) {
       console.log("Email not found in database");
       throw err;
@@ -74,91 +78,84 @@ app.post("/Login", (req, res) => {
       res.end("Email not found. Please sign up!");
     } else {
       console.log("SQL result", result);
-      // bcrypt.compare(password, result[0].password, (err, hash) => {
-      //   console.log("Inside compare..");
-      //   if (err) throw err;
-      //   if (hash == true) {
-      //     console.log("hash is true");
-      //     res.cookie("user_cookie", result[0].userid, {
-      //       maxAge: 900000,
-      //       httpOnly: false,
-      //       path: "/"
-      //     });
-      //     req.session.userid = result[0].userid;
-      //     res.writeHead(200, {
-      //       "Content-Type": "application/json"
-      //     });
-      //     res.end(JSON.stringify(result[0]));
-      //   } else {
-      //     console.log("Passwords don't match");
-      //   }
-      // });
-      res.cookie("user_cookie", result[0].userid, {
-        maxAge: 900000,
-        httpOnly: false,
-        path: "/"
+      console.log("Password", password);
+      bcrypt.compare(password, result[0].password, (err, hash) => {
+        console.log(
+          "Inside method tp compare encrypted password with plain text "
+        );
+        if (err) throw err;
+        if (hash == true) {
+          console.log("Hash match! Login successful");
+          res.cookie("user_cookie", result[0].userid, {
+            maxAge: 900000,
+            httpOnly: false,
+            path: "/"
+          });
+          req.session.userid = result[0].userid;
+          res.writeHead(200, {
+            "Content-Type": "application/json"
+          });
+          res.end(JSON.stringify(result[0]));
+        } else {
+          console.log("Passwords don't match");
+        }
       });
-      req.session.userid = result[0].userid;
-      res.writeHead(200, {
-        "Content-Type": "application/json"
-      });
-      res.end(JSON.stringify(result[0]));
     }
   });
 });
 
 app.get("/Logout", (req, res) => {
+  console.log("Inside logout request");
   if (req.session) {
     req.session.destroy(function(err) {
       if (err) {
         return res.end("Unable to logout");
       } else {
-        return res.end("Logout Successful");
+        console.log("User logged out!");
+        return res.end("Logout Successful!");
       }
     });
   }
 });
 
 app.post("/Register", (request, response) => {
-  console.log("Inside Register POST request");
+  console.log("Inside Register request");
   let email = request.body.email;
-  let password = request.body.password;
   let firstName = request.body.firstName;
   let lastName = request.body.lastName;
-  let sql1 = "SELECT * from `users` WHERE `email`= ?";
-  let sql2 =
-    "INSERT INTO users (`userid`,`lastname`, `firstname`, `email`, `password`) VALUES (NULL,?,?,?,?)";
-  pool.query(sql1, [email], (dbError, isUser) => {
+  let sql = "SELECT * from `users` WHERE `email`= ?";
+  pool.query(sql, [email], (dbError, isUser) => {
     if (dbError) throw dbError;
-    else {
-      console.log("Check if email already exists. If no continue..");
-      if (isUser.length === 0) {
-        pool.query(
-          sql2,
-          [lastName, firstName, email, password],
-          (err, result) => {
-            if (err) {
-              console.log("Unable to create user");
-              throw err;
-              response.writeHead(400, {
-                "Content-Type": "text/plain"
-              });
-              response.end("Unable to create user");
-            } else {
-              console.log("User creation successful");
-              response.writeHead(200, {
-                "Content-Type": "application/json"
-              });
-              response.end(JSON.stringify(result));
+
+    if (isUser.length === 0) {
+      bcrypt.hash(request.body.password, saltRounds, (error, hash) => {
+        if (error) throw error;
+        else {
+          console.log("Password hash created!");
+          let password = hash;
+          let sql1 =
+            "INSERT INTO users (`userid`,`lastname`, `firstname`, `email`, `password`) VALUES (NULL,?,?,?,?)";
+          pool.query(
+            sql1,
+            [lastName, firstName, email, password],
+            (error, result) => {
+              if (error) throw error;
+              else {
+                console.log("User creation successful");
+                response.writeHead(200, {
+                  "Content-Type": "application/json"
+                });
+                response.end(JSON.stringify(result));
+              }
             }
-          }
-        );
-      } else {
-        response.writeHead(400, {
-          "Content-Type": "text/plain"
-        });
-        response.end("Email already exists. Please sign in");
-      }
+          );
+        }
+      });
+    } else {
+      response.writeHead(400, {
+        "Content-Type": "text/plain"
+      });
+      response.end("Email already exists. Please sign in");
     }
   });
 });
@@ -266,8 +263,8 @@ app.get("/Trips", (req, res) => {
   let userId = req.session.userid;
   let sql =
     "SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.userid=?";
-  let sql =
-    "SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.userid=?";
+  //let sql =
+  //"SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.userid=?";
 
   console.log("Traveller dashboard");
   pool.query(sql, [userId], (err, result) => {
