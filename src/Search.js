@@ -9,6 +9,7 @@ import Counter from "templates/Counter";
 import RadioGroup from "templates/RadioGroup";
 import Dropdown from "templates/Dropdown";
 import moment from "moment";
+import { Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 import "react-dates/initialize";
 import "react-dates/lib/css/_datepicker.css";
 import "styles/search.scss";
@@ -28,7 +29,8 @@ class Search extends Component {
         pets: false
       },
       location: null,
-      location_name: null
+      location_name: null,
+      showError: false
     };
   }
   componentDidMount() {
@@ -72,12 +74,16 @@ class Search extends Component {
     this.setState({ dropdownIsOpen: !this.state.dropdownIsOpen });
   onClickSearch = () => {
     const { location, startDate, endDate, guests } = this.state;
-    this.props.onClick({
-      location,
-      startDate,
-      endDate,
-      guests
-    });
+    if (!startDate || !endDate) {
+      this.setState({ showError: true })
+    } else {
+      this.props.onClick({
+        location,
+        startDate,
+        endDate,
+        guests
+      });
+    }
   };
   render() {
     const {
@@ -86,30 +92,35 @@ class Search extends Component {
       endDate,
       focusedInput,
       dropdownIsOpen,
+      location,
+      showError
     } = this.state;
     const { query } = this.props;
     return (
       <div className="search">
         <input
-          className="location-search"
+          className={`location-search${(showError && !location) ? " error" : ""}`}
           ref={this.input}
           placeholder={`${query.location_name !== undefined ? query.location_name : "Where do you want to go?"}`}
+          onFocus={() => this.setState({showError: false})}
           onChange={() => this.onChange()}
         />
         <div className="v-line" />
-        <DateRangePicker
-          startDate={startDate} // momentPropTypes.momentObj or null,
-          startDateId="listing_header_start_date" // PropTypes.string.isRequired,
-          endDate={endDate} // momentPropTypes.momentObj or null,
-          endDateId="listing_header_end_date" // PropTypes.string.isRequired,
-          startDatePlaceholderText={query.startDate === null ? "Arrive": moment(query.startDate).format("YYYY-MM-DD")}
-          endDatePlaceholderText={query.endDate === null ? "Depart": moment(query.endDate).format("YYYY-MM-DD")}
-          onDatesChange={({ startDate, endDate }) =>
-            this.setState({ startDate, endDate })
-          } // PropTypes.func.isRequired,
-          focusedInput={focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
-          onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
-        />
+        <button className={`my-date-range${(showError && !startDate && !endDate) ? " error" : ""}`} onClick={() => this.setState({showError: false})}>
+          <DateRangePicker
+            startDate={startDate} // momentPropTypes.momentObj or null,
+            startDateId="listing_header_start_date" // PropTypes.string.isRequired,
+            endDate={endDate} // momentPropTypes.momentObj or null,
+            endDateId="listing_header_end_date" // PropTypes.string.isRequired,
+            startDatePlaceholderText={query.startDate === null ? "Arrive" : moment(query.startDate).format("YYYY-MM-DD")}
+            endDatePlaceholderText={query.endDate === null ? "Depart" : moment(query.endDate).format("YYYY-MM-DD")}
+            onDatesChange={({ startDate, endDate }) =>
+              this.setState({ startDate, endDate })
+            } // PropTypes.func.isRequired,
+            focusedInput={focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
+            onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
+          />
+        </button>
         <div className="v-line" />
         <div className="dropdown-group">
           <button
@@ -148,9 +159,18 @@ class Search extends Component {
           </Dropdown>
         </div>
         <div className="v-line" />
-        <button type="button" className="submit" onClick={this.onClickSearch}>
-          Search
+        <div className="submit">
+          <button type="button" id="Popover2" onClick={this.onClickSearch}>
+            Search
         </button>
+          <Popover placement="bottom" isOpen={this.state.showError} target="Popover2">
+            <PopoverHeader>Error</PopoverHeader>
+            <PopoverBody>
+              {location || <p>Please choose a location.</p>}
+              {(!!startDate && !!endDate) || <p>Select valid dates</p>}
+            </PopoverBody>
+          </Popover>
+        </div>
       </div>
     );
   }

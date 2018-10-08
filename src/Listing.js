@@ -44,8 +44,8 @@ class Listing extends Component {
     return (
       <div className="listing">
         <div className="top-container">
-          <Header showLogin />
-          <Search query={this.props.query} />>
+          <Header showLogin userInfo={this.props.userInfo} />
+          <Search query={this.props.query} />
         </div>
         <div className="list-container">
           <h4>{`We found ${items.length} result${

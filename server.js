@@ -286,8 +286,7 @@ app.get("/Trips", (req, res) => {
 
 app.get("/OwnerDash", (req, res) => {
   let ownerId = req.session.userid;
-  let sql =
-    "SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.ownerid=?";
+  let sql = "SELECT * FROM `property` WHERE ownerid = ?";
   pool.query(sql, [ownerId], (err, result) => {
     if (err) {
       throw err;
@@ -300,7 +299,6 @@ app.get("/OwnerDash", (req, res) => {
         "Content-Type": "application/json"
       });
       res.end(JSON.stringify(result));
-      console.log(result);
     }
   });
 });
@@ -349,7 +347,9 @@ app.post("/Booking", (req, res) => {
             console.log(result1);
             pool.query(sql3, [propertyId], (err, result2) => {
               if (err) throw err;
-              else console.log(result2);
+              else {
+                res.end("Bookng Successful");
+              };
             });
           }
         }

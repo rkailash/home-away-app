@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
 import axios from "axios";
 import cookie from "react-cookies";
-import { Button, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
+import { Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 import Header from "./Header";
 import "styles/login.scss";
 
@@ -40,7 +40,7 @@ class Login extends Component {
           this.props.setUserInfo(response.data);
         } else {
           console.log("Login unsuccessful!");
-          this.setState({ authFlag: false });
+          this.setState({ authFlag: false, showLoginError: true });
         }
       });
     } else {

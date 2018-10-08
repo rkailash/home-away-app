@@ -2,6 +2,7 @@ import React, { Component, Fragment } from "react";
 import { Button, Form, FormGroup, Input } from "reactstrap";
 import Header from "./Header";
 import { Link, Route } from "react-router-dom";
+import {images} from './images';
 import ImageGallery from 'templates/ImageGallery';
 import axios from 'axios';
 import moment from 'moment';
@@ -16,35 +17,7 @@ const navList = [
   { value: "past", label: "Past Trips", imgUrl: '/arrow.svg' },
 ];
 
-const images = [
-  {
-    key: "1",
-    value:
-      "https://odis.homeaway.com/odis/listing/c64e4758-21ad-40c3-98f2-62343335315c.c10.jpg"
-  },
-  {
-    key: "2",
-    value:
-      "https://odis.homeaway.com/odis/listing/9ce4c483-36f1-436e-9759-e489ba48a1bb.c10.jpg"
-  },
-  {
-    key: "3",
-    value:
-      "https://odis.homeaway.com/odis/listing/23edb030-24f4-492f-a5b6-b0d9227f5091.c10.jpg"
-  },
-  {
-    key: "4",
-    value:
-      "https://odis.homeaway.com/odis/listing/8d7baf17-f578-4334-8061-7ea9f2279f66.c10.jpg"
-  },
-  {
-    key: "5",
-    value:
-      "https://odis.homeaway.com/odis/listing/87499f18-75d6-4637-86ed-b072d7ce5825.c10.jpg"
-  }
-];
-
-const MyTrips = ({ trips, activeNav, setActiveNav }) => {
+const MyTrips = ({ trips, activeNav, setActiveNav, userInfo }) => {
   // bathrooms: 3
   // bedrooms: 3
   // bookedflag: 1
@@ -73,17 +46,17 @@ const MyTrips = ({ trips, activeNav, setActiveNav }) => {
       </ul>
       {
         trips.length === 0 ?
-          <Fragment>
+          <div className="no-trips">
             <p>You don't have any past or upcoming trips.</p>
             <button type="button" className="start-search main-btn">
               Start your search
-        </button>
-          </Fragment> :
+            </button>
+          </div> :
           <ul className="trip-list">
             {
               trips.map((item, key) => (
                 <div className="list-item" key={key}>
-                  <ImageGallery showThumbnail={false} images={images} />
+                  <ImageGallery showThumbnail={false} images={images[key]} />
                   <div className="right-container">
                     <div className="top-container">
                       <Link to={`/Property/${item.propertyid}`}>
@@ -243,7 +216,6 @@ class TravelerDashboard extends Component {
     axios
       .get(`http://localhost:3001/Trips`)
       .then(response => {
-        console.log("GET response :", response.data);
         this.setState({ trips: response.data })
       });
   }
@@ -263,7 +235,7 @@ class TravelerDashboard extends Component {
           ))}
         </ul>
         <div className="results">
-          <Route path="/Traveler/trips" render={() => (<MyTrips trips={trips} activeNav={activeNav} setActiveNav={this.setActiveNav} />)} />
+          <Route path="/Traveler/trips" render={() => (<MyTrips userInfo={userInfo} trips={trips} activeNav={activeNav} setActiveNav={this.setActiveNav} />)} />
           <Route
             path="/Traveler/profile"
             render={() => (

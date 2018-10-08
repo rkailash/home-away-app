@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
 import cookie from "react-cookies";
 import Header from "./Header";
+import { Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 import axios from "axios";
 import "styles/ownerLogin.scss";
 
@@ -9,9 +10,14 @@ class OwnerLogin extends Component {
   state = {
     account: { email: "", password: "" },
     authFlag: false,
-    signUpFlag: false
+    signUpFlag: false,
+    showEmailError: false,
+    showLoginError: false
   };
-
+  validateEmail = email => {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  }
   handleSignUp = e => {
     e.preventDefault();
     this.setState({ signUpFlag: true });
@@ -30,24 +36,25 @@ class OwnerLogin extends Component {
 
     const data = { ...this.state.account };
 
-    axios.defaults.withCredentials = true;
+    if (this.validateEmail(data.email)) {
+      axios.defaults.withCredentials = true;
+      axios.post("http://localhost:3001/Login", data).then(response => {
+        console.log("Axios POST response:", response.status);
 
-    axios.post("http://localhost:3001/Login", data).then(response => {
-      console.log("Axios POST response:", response.status);
-
-      if (response.status === 200) {
-        console.log("Login successful");
-        this.props.setUserInfo(response.data);
-        this.setState({ authFlag: true });
-      } else {
-        console.log("Login unsuccessful!");
-        this.setState({ authFlag: false });
-        this.setState({ signUpFlag: true });
-      }
-    });
+        if (response.status === 200) {
+          this.setState({ authFlag: true });
+          this.props.setUserInfo(response.data);
+        } else {
+          console.log("Login unsuccessful!");
+          this.setState({ authFlag: false, showLoginError: true });
+        }
+      });
+    } else {
+      this.setState({ showEmailError: true });
+    }
   };
   render() {
-    const { account } = this.state;
+    const { account, showEmailError, showLoginError } = this.state;
     /*    if (this.state.signUpFlag === true) return <Redirect to="/Register" />;
   */
     if (this.state.signUpFlag === true) return <Redirect to="/Register" />;
@@ -56,7 +63,7 @@ class OwnerLogin extends Component {
         pathname: "/",
         state: {
           referrer: {
-            
+
           }
         }
       }} />;
@@ -78,14 +85,23 @@ class OwnerLogin extends Component {
                     Sign Up
                   </Link>
                 </p>
-                <input
-                  autoFocus
-                  tabIndex={1}
-                  type="email"
-                  name="email"
-                  placeholder="Email address"
-                  onChange={this.handleChange}
-                />
+                <div>
+                  <input
+                    autoFocus
+                    tabIndex={1}
+                    type="email"
+                    name="email"
+                    placeholder="Email address"
+                    value={account.email}
+                    onChange={this.handleChange}
+                    onFocus={() => this.setState({ showEmailError: false })}
+                    id="Popover3"
+                  />
+                  <Popover placement="right" isOpen={this.state.showEmailError} target="Popover3">
+                    <PopoverHeader>Error</PopoverHeader>
+                    <PopoverBody>Invalid email address.</PopoverBody>
+                  </Popover>
+                </div>
                 <input
                   tabIndex={2}
                   type="password"
@@ -102,6 +118,7 @@ class OwnerLogin extends Component {
                 >
                   Log in
                 </button>
+                {showLoginError && <small className="my-error">Email or password is incorrect.</small>}
               </form>
             </div>
           </div>

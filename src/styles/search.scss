@@ -25,12 +25,20 @@
       text-align: center;
     }
   }
+  .my-date-range {
+    &.error {
+      outline: 2px solid red;
+    }
+  }
   .location-search {
     flex: 1 1 250px;
     padding-left: 8px;
     height: 46px;
     color:$black;
     font-size: 19px;
+    &.error {
+      outline: 2px solid red;
+    }
     ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
         color:#484848;
         opacity: 1; /* Firefox */
@@ -53,16 +61,19 @@
     width: 4px;
     display: inline-block;
   }
-  button.submit {
-    cursor: pointer;
-    background: $blue;
-    height: 46px;
-    border-radius: 40px;
+  .submit {
     flex: 0 0 140px;
-    font-size: 20px;
-    color: $offwhite;
     margin-right: 8px;
     margin-left: auto;
+    button {
+      cursor: pointer;
+      background: $blue;
+      height: 46px;
+      border-radius: 40px;
+      font-size: 20px;
+      width: 100%;
+      color: $offwhite;
+    }
   }
   button.guest-selector {
     background: #fff;
