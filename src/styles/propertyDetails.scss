@@ -80,6 +80,20 @@
           .DateInput_Input__focused {
             color: $blue;
           }
+          &:after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: url(/images/calendar.svg) no-repeat;
+            margin-right: 6px;
+            width: 20px;
+            height: 20px;
+            background-size: 90% auto;
+            margin: auto 6px;
+          }
         }
       }
     }

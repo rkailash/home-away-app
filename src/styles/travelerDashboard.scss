@@ -5,6 +5,11 @@
   font-family: 'Lato', sans-serif;
   .mytrips {
     display: flex;
+    .no-trips {
+      text-align: center;
+      width: 100%;
+      margin-top: 40px;
+    }
     .nav-list {
       position: relative;
       overflow: hidden;

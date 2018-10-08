@@ -194,6 +194,31 @@ app.post("/Owner", (req, res) => {
   );
 });
 
+app.post("/UpdateUser", (req, res) => {
+  console.log("Inside Update User", req.body);
+  let firstName = req.body.firstname;
+  let lastName = req.body.lastname;
+  let location = req.body.location;
+  let userId = req.session.userid;
+
+  let sql = "UPDATE users SET firstname=?,lastname=?,location=? WHERE userid=?";
+  pool.query(sql, [firstName, lastName, location, userId], (err, result) => {
+    if (err) {
+      throw err;
+      res.writeHead(400, {
+        "Content-Type": "text/plain"
+      });
+      res.end("No results returned");
+    } else {
+      console.log(`User ${userId} has been updated`);
+      res.writeHead(200, {
+        "Content-Type": "application/json"
+      });
+      res.end(JSON.stringify(result));
+    }
+  });
+});
+
 app.get("/Home", (req, res) => {
   console.log(req.query);
   let location = req.query.location;
@@ -215,7 +240,7 @@ app.get("/Home", (req, res) => {
 });
 
 app.get("/PropertyList", (req, res) => {
-  console.log("Property Details");
+  console.log("Inside Property Results Page");
   let location = req.query.location;
   let startdate = req.query.startDate;
   let enddate = req.query.endDate;
@@ -234,13 +259,14 @@ app.get("/PropertyList", (req, res) => {
         "Content-Type": "application/json"
       });
       res.end(JSON.stringify(result));
-      console.log(result);
+      console.log("Result:", result);
     }
   });
 });
 
 app.get("/Property/:id", (req, res) => {
   let propertyId = req.params.id;
+  console.log("Inside Property Page of ID:", propertyId);
   let sql = "SELECT * from `property` where `propertyid`= ?";
   pool.query(sql, [propertyId], (err, result) => {
     if (err) {
@@ -254,7 +280,7 @@ app.get("/Property/:id", (req, res) => {
         "Content-Type": "application/json"
       });
       res.end(JSON.stringify(result));
-      console.log(result);
+      console.log("Result is:", result);
     }
   });
 });
@@ -286,8 +312,7 @@ app.get("/Trips", (req, res) => {
 
 app.get("/OwnerDash", (req, res) => {
   let ownerId = req.session.userid;
-  let sql =
-    "SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.ownerid=?";
+  let sql = "UPDATE property SET bookedflag=1 WHERE propertyid=?";
   pool.query(sql, [ownerId], (err, result) => {
     if (err) {
       throw err;
@@ -300,7 +325,6 @@ app.get("/OwnerDash", (req, res) => {
         "Content-Type": "application/json"
       });
       res.end(JSON.stringify(result));
-      console.log(result);
     }
   });
 });
@@ -330,6 +354,7 @@ app.post("/Booking", (req, res) => {
   let endDate = req.body.enddate;
   let propertyId = req.body.propertyid;
   let userId = req.session.userid;
+  console.log("Booking made by User ID:", userId);
   let sql1 = "SELECT ownerid FROM property WHERE propertyid =?";
   let sql2 =
     "INSERT INTO booking (`bookingid`,`propertyid`,`userid`,`ownerid`,`startdate`, `enddate`) VALUES (NULL,?,?,?,?,?)";
@@ -346,10 +371,12 @@ app.post("/Booking", (req, res) => {
         (err, result1) => {
           if (err) throw err;
           else {
-            console.log(result1);
+            console.log("Booking Successful", result1);
             pool.query(sql3, [propertyId], (err, result2) => {
               if (err) throw err;
-              else console.log(result2);
+              else {
+                res.end("Bookng Successful");
+              }
             });
           }
         }

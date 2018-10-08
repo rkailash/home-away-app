@@ -51,7 +51,7 @@ class App extends Component {
             path="/OwnerLogin"
             render={props => (
               <OwnerLogin
-                {...[props]}
+                {...props}
                 setUserInfo={userInfo => this.setState({ userInfo })}
               />
             )}
@@ -60,7 +60,7 @@ class App extends Component {
           <Route path="/Owner" component={Owner} />
           <Route
             path="/Listing"
-            render={props => <Listing {...props} query={searchQuery} />}
+            render={props => <Listing {...props} userInfo={userInfo} query={searchQuery} />}
           />
           <Route
             path="/Property"

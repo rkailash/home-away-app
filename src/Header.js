@@ -61,7 +61,7 @@ const UserDropdown = ({ type, name }) => (
                 </g>
               </g>
             </svg>
-            <Link to="/OD">Owner Dashboard</Link>
+            <Link to="/od/properties">Owner Dashboard</Link>
           </DropdownItem>
           <DropdownItem divider />
         </Fragment>
@@ -126,7 +126,7 @@ class Header extends Component {
           )}
           {renderDropdown && renderDropdown(this.toggle, this.state.dropdownOpen)}
           {
-            hideLyp || <Link to="/od" className="lyp"><button type="button">
+            hideLyp || <Link to="/od/add-new" className="lyp"><button type="button">
               List your Property
             </button></Link>
           }

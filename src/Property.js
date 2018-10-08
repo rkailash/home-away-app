@@ -4,36 +4,11 @@ import axios from "axios";
 import PropertyDetails from "./PropertyDetails";
 import Header from "./Header";
 import Search from "./Search";
+import {images} from './images';
 import moment from "moment";
+import { Redirect } from "react-router-dom";
 import "styles/productPage.scss";
-
-const images = [
-  {
-    key: "1",
-    value:
-      "https://odis.homeaway.com/odis/listing/c64e4758-21ad-40c3-98f2-62343335315c.c10.jpg"
-  },
-  {
-    key: "2",
-    value:
-      "https://odis.homeaway.com/odis/listing/9ce4c483-36f1-436e-9759-e489ba48a1bb.c10.jpg"
-  },
-  {
-    key: "3",
-    value:
-      "https://odis.homeaway.com/odis/listing/23edb030-24f4-492f-a5b6-b0d9227f5091.c10.jpg"
-  },
-  {
-    key: "4",
-    value:
-      "https://odis.homeaway.com/odis/listing/8d7baf17-f578-4334-8061-7ea9f2279f66.c10.jpg"
-  },
-  {
-    key: "5",
-    value:
-      "https://odis.homeaway.com/odis/listing/87499f18-75d6-4637-86ed-b072d7ce5825.c10.jpg"
-  }
-];
+import { userInfo } from "os";
 
 const item = {
   price: 75,
@@ -52,7 +27,9 @@ class Property extends Component {
     this.state = {
       isFullScreen: false,
       currentImagePos: 0,
-      propertyDetails: undefined
+      propertyDetails: undefined,
+      goToLogin: false,
+      isBookingSuccessful: undefined
     };
   }
   componentDidMount() {
@@ -73,40 +50,48 @@ class Property extends Component {
     this.setState({ isFullScreen: false });
   };
   onBook = () => {
-    const data = {
-      propertyid: this.props.location.pathname.split("Property/")[1],
-      startdate: moment(this.props.query.startDate).format("YYYY-MM-DD"),
-      enddate: moment(this.props.query.endDate).format("YYYY-MM-DD")
-    };
-
-    console.log(data);
-    axios.post("http://localhost:3001/Booking", data).then(response => {
-      console.log("Axios POST response:", response.status);
-
-      if (response.status === 200) {
-        this.setState({ authFlag: true });
-        this.props.setUserInfo(response.data);
-      } else {
-        console.log("Login unsuccessful!");
-        this.setState({ authFlag: false });
-      }
-    });
+    if(!this.props.userInfo) {
+      this.setState({goToLogin: true});
+    } else {
+      const data = {
+        propertyid: this.props.location.pathname.split("Property/")[1],
+        startdate: moment(this.props.query.startDate).format("YYYY-MM-DD"),
+        enddate: moment(this.props.query.endDate).format("YYYY-MM-DD")
+      };
+      axios.post("http://localhost:3001/Booking", data).then(response => {
+        console.log("Axios POST response:", response.status);
+  
+        if (response.status === 200) {
+          console.log('booking success');
+          this.setState({ isBookingSuccessful: true });
+          this.props.setUserInfo(response.data);
+        } else {
+          console.log("Booking unsuccessful!");
+          this.setState({ isBookingSuccessful: false });
+        }
+      });
+    }
   };
 
   render() {
-    const { propertyDetails, isFullScreen, currentImagePos } = this.state;
-    console.log(this.props.userInfo);
+    const { propertyDetails, goToLogin, isFullScreen, isBookingSuccessful, currentImagePos } = this.state;
+    const {userInfo} = this.props;
+    if(goToLogin) {
+      return <Redirect to="/TravellerLogin" />
+    } if(isBookingSuccessful) {
+      return <Redirect to="/Traveler/trips" />
+    }
     return (
       <div className="product-page">
         <div className="headers">
-          <Header showLogin />
+          <Header showLogin userInfo={this.props.userInfo} />
           <Search query={this.props.query} />
         </div>
         <div className="top-container">
           <ImageGallery
             onExpand={() => this.openFullScreen()}
             onToggle={i => this.setState({ currentImagePos: i })}
-            images={images}
+            images={images[userInfo.userid]}
             isExpandable
           />
           {propertyDetails === undefined ? (
@@ -120,7 +105,7 @@ class Property extends Component {
         </div>
         {isFullScreen && (
           <div className="fullscreen-gallery">
-            <ImageGallery images={images} openAt={currentImagePos} />
+            <ImageGallery images={images[userInfo.userid]} openAt={currentImagePos} />
             <button
               type="button"
               className="close-gallery"
