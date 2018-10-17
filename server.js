@@ -4,14 +4,19 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const multer = require("multer");
-const uuidv4 = require("uuid/v4");
 const path = require("path");
-const fs = require("fs");
+
 var serveStatic = require("serve-static");
 
-const { Users } = require("./models/user");
-
+//MongoDB connection
+const mongoose = require("mongoose");
+const mongoDB = "mongodb://kailashr:passw0rd1@ds237855.mlab.com:37855/homeaway";
+mongoose.connect(mongoDB);
+mongoose.Promise = global.Promise;
+let db = mongoose.connection;
+//Bind connection to error event to get notified for connection errors
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
+const UserModel = require("./models/User");
 app.set("view engine", "ejs");
 
 app.use(
@@ -23,8 +28,12 @@ app.use(
     activeDuration: 5 * 60 * 1000
   })
 );
-
 app.use(bodyParser.json());
+
+//Multer
+const multer = require("multer");
+const uuidv4 = require("uuid/v4");
+const fs = require("fs");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const folderName = "./uploads";
@@ -38,7 +47,6 @@ const storage = multer.diskStorage({
     cb(null, newFilename);
   }
 });
-
 const upload = multer({ storage });
 
 //Allow Access Control
@@ -59,28 +67,34 @@ app.use(function(req, res, next) {
 
 app.post("/Login", (req, res) => {
   console.log("Inside Login request");
-  let email = req.body.email;
-  let password = req.body.password;
-  console.log("Username:", email + " password:", password);
-  Users.findOne({}, function(err, user) {
-    if (err) {
+  UserModel.findOne({ email: req.body.email })
+
+    .catch(err => {
       res.code = "400";
       res.value =
         "The email and password you entered did not match our records. Please double-check and try again.";
       console.log(res.value);
       res.sendStatus(400).end();
-    } else if (user && user.password == password) {
-      res.code = "200";
-      res.value = user;
-      res.cookie("cookie", "admin", {
-        maxAge: 900000,
-        httpOnly: false,
-        path: "/"
-      });
-      res.sendStatus(200).end();
-    }
-  });
+    })
+
+    .then(user => {
+      if (user && user.password == req.body.password) {
+        res.code = "200";
+        res.value = user;
+        res.cookie("cookie", "admin", {
+          maxAge: 900000,
+          httpOnly: false,
+          path: "/"
+        });
+        res.sendStatus(200).end();
+        console.log("Login succesful");
+      } else {
+        console.log("Passwords don't match");
+      }
+    });
 });
+
+//
 
 // app.get("/Logout", (req, res) => {
 //   console.log("Inside logout request");
