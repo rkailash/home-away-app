@@ -4,15 +4,13 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const pool = require("./pool");
 const multer = require("multer");
 const uuidv4 = require("uuid/v4");
 const path = require("path");
-const mysql = require("mysql");
 const fs = require("fs");
-const bcrypt = require("bcrypt");
 var serveStatic = require("serve-static");
-const saltRounds = 10;
+
+const { Users } = require("./models/user");
 
 app.set("view engine", "ejs");
 
@@ -61,335 +59,288 @@ app.use(function(req, res, next) {
 
 app.post("/Login", (req, res) => {
   console.log("Inside Login request");
-  console.log(req.body);
   let email = req.body.email;
   let password = req.body.password;
-  console.log(email, password);
-  let sql = "SELECT * FROM `users` WHERE `email` = ?";
-  pool.query(sql, [email], (err, result) => {
-    console.log("Password:", password);
-    console.log("SQL", result);
+  console.log("Username:", email + " password:", password);
+  Users.findOne({}, function(err, user) {
     if (err) {
-      console.log("Email not found in database");
-      throw err;
-      res.writeHead(404, {
-        "Content-Type": "text/plain"
+      res.code = "400";
+      res.value =
+        "The email and password you entered did not match our records. Please double-check and try again.";
+      console.log(res.value);
+      res.sendStatus(400).end();
+    } else if (user && user.password == password) {
+      res.code = "200";
+      res.value = user;
+      res.cookie("cookie", "admin", {
+        maxAge: 900000,
+        httpOnly: false,
+        path: "/"
       });
-      res.end("Email not found. Please sign up!");
-    } else {
-      console.log("SQL result", result);
-      console.log("Password", password);
-      bcrypt.compare(password, result[0].password, (err, hash) => {
-        console.log(
-          "Inside method tp compare encrypted password with plain text "
-        );
-        if (err) throw err;
-        if (hash == true) {
-          console.log("Hash match! Login successful");
-          res.cookie("user_cookie", result[0].userid, {
-            maxAge: 900000,
-            httpOnly: false,
-            path: "/"
-          });
-          req.session.userid = result[0].userid;
-          res.writeHead(200, {
-            "Content-Type": "application/json"
-          });
-          res.end(JSON.stringify(result[0]));
-        } else {
-          res.writeHead(200, {
-            "Content-Type": "text/plain"
-          });
-          res.end("Login unsuccesful");
-          console.log("Passwords don't match");
-        }
-      });
+      res.sendStatus(200).end();
     }
   });
 });
 
-app.get("/Logout", (req, res) => {
-  console.log("Inside logout request");
-  if (req.session) {
-    req.session.destroy(function(err) {
-      if (err) {
-        return res.end("Unable to logout");
-      } else {
-        console.log("User logged out!");
-        return res.end("Logout Successful!");
-      }
-    });
-  }
-});
+// app.get("/Logout", (req, res) => {
+//   console.log("Inside logout request");
+//   if (req.session) {
+//     req.session.destroy(function(err) {
+//       if (err) {
+//         return res.end("Unable to logout");
+//       } else {
+//         console.log("User logged out!");
+//         return res.end("Logout Successful!");
+//       }
+//     });
+//   }
+// });
 
 app.post("/Register", (request, response) => {
   console.log("Inside Register request");
-  let email = request.body.email;
-  let firstName = request.body.firstName;
-  let lastName = request.body.lastName;
-  let sql = "SELECT * from `users` WHERE `email`= ?";
-  pool.query(sql, [email], (dbError, isUser) => {
-    if (dbError) throw dbError;
-
-    if (isUser.length === 0) {
-      bcrypt.hash(request.body.password, saltRounds, (error, hash) => {
-        if (error) throw error;
-        else {
-          console.log("Password hash created!");
-          let password = hash;
-          let sql1 =
-            "INSERT INTO users (`userid`,`lastname`, `firstname`, `email`, `password`) VALUES (NULL,?,?,?,?)";
-          pool.query(
-            sql1,
-            [lastName, firstName, email, password],
-            (error, result) => {
-              if (error) throw error;
-              else {
-                console.log("User creation successful");
-                response.writeHead(200, {
-                  "Content-Type": "application/json"
-                });
-                response.end(JSON.stringify(result));
-              }
-            }
-          );
-        }
-      });
-    } else {
-      response.writeHead(400, {
-        "Content-Type": "text/plain"
-      });
-      response.end("Email already exists. Please sign in");
-    }
+  let User = new Users({
+    email: request.body.email,
+    password: request.body.password
   });
-});
 
-app.post("/Owner", (req, res) => {
-  console.log("Inside Owner POST request");
-  let ownerId = req.session.userid;
-  let name = req.body.details.headline;
-  let sleeps = req.body.details.accomodates;
-  let bathrooms = req.body.details.bathrooms;
-  let bedrooms = req.body.details.bedrooms;
-  let type = req.body.details.type;
-  let price = req.body.price;
-  let location = req.body.location;
-  let sql =
-    "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,'san jose')";
-  pool.query(
-    sql,
-    [ownerId, name, sleeps, bathrooms, bedrooms, type, price],
-    (err, result) => {
-      if (err) {
-        console.log("Unable post property");
-        throw err;
-        res.writeHead(400, {
-          "Content-Type": "text/plain"
-        });
-        res.end("Unable to create property");
-      } else {
-        console.log("Property created successful", result);
-        res.writeHead(200, {
-          "Content-Type": "application/json"
-        });
-        res.end(JSON.stringify(result));
-      }
+  User.save().then(
+    user => {
+      console.log("User created : ", user);
+      response.sendStatus(200).end();
+    },
+    err => {
+      console.log("Error Creating User");
+      response.sendStatus(400).end();
     }
   );
 });
 
-app.post("/UpdateUser", (req, res) => {
-  console.log("Inside Update User", req.body);
-  let firstName = req.body.firstname;
-  let lastName = req.body.lastname;
-  let location = req.body.location;
-  let userId = req.session.userid;
+// app.post("/Owner", (req, res) => {
+//   console.log("Inside Owner POST request");
+//   let ownerId = req.session.userid;
+//   let name = req.body.details.headline;
+//   let sleeps = req.body.details.accomodates;
+//   let bathrooms = req.body.details.bathrooms;
+//   let bedrooms = req.body.details.bedrooms;
+//   let type = req.body.details.type;
+//   let price = req.body.price;
+//   let location = req.body.location;
+//   let sql =
+//     "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,'san jose')";
+//   pool.query(
+//     sql,
+//     [ownerId, name, sleeps, bathrooms, bedrooms, type, price],
+//     (err, result) => {
+//       if (err) {
+//         console.log("Unable post property");
+//         throw err;
+//         res.writeHead(400, {
+//           "Content-Type": "text/plain"
+//         });
+//         res.end("Unable to create property");
+//       } else {
+//         console.log("Property created successful", result);
+//         res.writeHead(200, {
+//           "Content-Type": "application/json"
+//         });
+//         res.end(JSON.stringify(result));
+//       }
+//     }
+//   );
+// });
 
-  let sql = "UPDATE users SET firstname=?,lastname=?,location=? WHERE userid=?";
-  pool.query(sql, [firstName, lastName, location, userId], (err, result) => {
-    if (err) {
-      throw err;
-      res.writeHead(400, {
-        "Content-Type": "text/plain"
-      });
-      res.end("No results returned");
-    } else {
-      console.log(`User ${userId} has been updated`);
-      res.writeHead(200, {
-        "Content-Type": "application/json"
-      });
-      res.end(JSON.stringify(result));
-    }
-  });
-});
+// app.post("/UpdateUser", (req, res) => {
+//   console.log("Inside Update User", req.body);
+//   let firstName = req.body.firstname;
+//   let lastName = req.body.lastname;
+//   let location = req.body.location;
+//   let userId = req.session.userid;
 
-app.get("/Home", (req, res) => {
-  console.log(req.query);
-  let location = req.query.location;
-  let sql = "SELECT * FROM `property` WHERE `location` = san jose";
-  pool.query(sql, location, (err, result) => {
-    if (err) {
-      throw err;
-      res.writeHead(400, {
-        "Content-Type": "text/plain"
-      });
-      res.end("No search results returned");
-    } else {
-      res.writeHead(200, {
-        "Content-Type": "application/json"
-      });
-      res.end(JSON.stringify(result));
-    }
-  });
-});
+//   let sql = "UPDATE users SET firstname=?,lastname=?,location=? WHERE userid=?";
+//   pool.query(sql, [firstName, lastName, location, userId], (err, result) => {
+//     if (err) {
+//       throw err;
+//       res.writeHead(400, {
+//         "Content-Type": "text/plain"
+//       });
+//       res.end("No results returned");
+//     } else {
+//       console.log(`User ${userId} has been updated`);
+//       res.writeHead(200, {
+//         "Content-Type": "application/json"
+//       });
+//       res.end(JSON.stringify(result));
+//     }
+//   });
+// });
 
-app.get("/PropertyList", (req, res) => {
-  console.log("Inside Property Results Page");
-  let location = req.query.location;
-  let startdate = req.query.startDate;
-  let enddate = req.query.endDate;
-  console.log("Request body:", location);
-  let sql = "SELECT * FROM `property` WHERE `location` = ?";
-  pool.query(sql, [location], (err, result) => {
-    console.log("SQL query", sql);
-    if (err) {
-      throw err;
-      res.writeHead(400, {
-        "Content-Type": "text/plain"
-      });
-      res.end("No search results returned");
-    } else {
-      res.writeHead(200, {
-        "Content-Type": "application/json"
-      });
-      res.end(JSON.stringify(result));
-      console.log("Result:", result);
-    }
-  });
-});
+// app.get("/Home", (req, res) => {
+//   console.log(req.query);
+//   let location = req.query.location;
+//   let sql = "SELECT * FROM `property` WHERE `location` = san jose";
+//   pool.query(sql, location, (err, result) => {
+//     if (err) {
+//       throw err;
+//       res.writeHead(400, {
+//         "Content-Type": "text/plain"
+//       });
+//       res.end("No search results returned");
+//     } else {
+//       res.writeHead(200, {
+//         "Content-Type": "application/json"
+//       });
+//       res.end(JSON.stringify(result));
+//     }
+//   });
+// });
 
-app.get("/Property/:id", (req, res) => {
-  let propertyId = req.params.id;
-  console.log("Inside Property Page of ID:", propertyId);
-  let sql = "SELECT * from `property` where `propertyid`= ?";
-  pool.query(sql, [propertyId], (err, result) => {
-    if (err) {
-      throw err;
-      res.writeHead(400, {
-        "Content-Type": "text/plain"
-      });
-      res.end("No search results returned");
-    } else {
-      res.writeHead(200, {
-        "Content-Type": "application/json"
-      });
-      res.end(JSON.stringify(result));
-      console.log("Result is:", result);
-    }
-  });
-});
+// app.get("/PropertyList", (req, res) => {
+//   console.log("Inside Property Results Page");
+//   let location = req.query.location;
+//   let startdate = req.query.startDate;
+//   let enddate = req.query.endDate;
+//   console.log("Request body:", location);
+//   let sql = "SELECT * FROM `property` WHERE `location` = ?";
+//   pool.query(sql, [location], (err, result) => {
+//     console.log("SQL query", sql);
+//     if (err) {
+//       throw err;
+//       res.writeHead(400, {
+//         "Content-Type": "text/plain"
+//       });
+//       res.end("No search results returned");
+//     } else {
+//       res.writeHead(200, {
+//         "Content-Type": "application/json"
+//       });
+//       res.end(JSON.stringify(result));
+//       console.log("Result:", result);
+//     }
+//   });
+// });
 
-app.get("/Trips", (req, res) => {
-  let userId = req.session.userid;
-  let sql =
-    "SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.userid=?";
-  //let sql =
-  //"SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.userid=?";
+// app.get("/Property/:id", (req, res) => {
+//   let propertyId = req.params.id;
+//   console.log("Inside Property Page of ID:", propertyId);
+//   let sql = "SELECT * from `property` where `propertyid`= ?";
+//   pool.query(sql, [propertyId], (err, result) => {
+//     if (err) {
+//       throw err;
+//       res.writeHead(400, {
+//         "Content-Type": "text/plain"
+//       });
+//       res.end("No search results returned");
+//     } else {
+//       res.writeHead(200, {
+//         "Content-Type": "application/json"
+//       });
+//       res.end(JSON.stringify(result));
+//       console.log("Result is:", result);
+//     }
+//   });
+// });
 
-  console.log("Traveller dashboard");
-  pool.query(sql, [userId], (err, result) => {
-    if (err) {
-      throw err;
-      res.writeHead(400, {
-        "Content-Type": "text/plain"
-      });
-      res.end("No search results returned");
-    } else {
-      res.writeHead(200, {
-        "Content-Type": "application/json"
-      });
-      res.end(JSON.stringify(result));
-      console.log("Trips result is", result);
-    }
-  });
-});
+// app.get("/Trips", (req, res) => {
+//   let userId = req.session.userid;
+//   let sql =
+//     "SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.userid=?";
+//   //let sql =
+//   //"SELECT property.*,booking.startdate,booking.enddate FROM property LEFT JOIN booking ON property.propertyid=booking.propertyid WHERE booking.userid=?";
 
-app.get("/OwnerDash", (req, res) => {
-  let ownerId = req.session.userid;
-  let sql = "SELECT * FROM `property` WHERE ownerid = ?";
-  console.log("Fetching Owner Dashboard of Owner ID", ownerId);
-  pool.query(sql, [ownerId], (err, result) => {
-    if (err) {
-      throw err;
-      res.writeHead(400, {
-        "Content-Type": "text/plain"
-      });
-      res.end("No search results returned");
-    } else {
-      res.writeHead(200, {
-        "Content-Type": "application/json"
-      });
-      console.log("Result is ", result);
-      res.end(JSON.stringify(result));
-    }
-  });
-});
+//   console.log("Traveller dashboard");
+//   pool.query(sql, [userId], (err, result) => {
+//     if (err) {
+//       throw err;
+//       res.writeHead(400, {
+//         "Content-Type": "text/plain"
+//       });
+//       res.end("No search results returned");
+//     } else {
+//       res.writeHead(200, {
+//         "Content-Type": "application/json"
+//       });
+//       res.end(JSON.stringify(result));
+//       console.log("Trips result is", result);
+//     }
+//   });
+// });
 
-app.post("/Property", (req, res) => {
-  let sql1 = "UPDATE ";
-  let sql2 =
-    "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,'san jose')";
-});
+// app.get("/OwnerDash", (req, res) => {
+//   let ownerId = req.session.userid;
+//   let sql = "SELECT * FROM `property` WHERE ownerid = ?";
+//   console.log("Fetching Owner Dashboard of Owner ID", ownerId);
+//   pool.query(sql, [ownerId], (err, result) => {
+//     if (err) {
+//       throw err;
+//       res.writeHead(400, {
+//         "Content-Type": "text/plain"
+//       });
+//       res.end("No search results returned");
+//     } else {
+//       res.writeHead(200, {
+//         "Content-Type": "application/json"
+//       });
+//       console.log("Result is ", result);
+//       res.end(JSON.stringify(result));
+//     }
+//   });
+// });
 
-app.post("/Photos", upload.single("selectedFile"), (req, res) => {
-  if (!req.file) {
-    console.log("No file received");
-    res.send({
-      success: false
-    });
-  } else {
-    console.log("File received!", res.file);
-    res.send();
-  }
-});
+// app.post("/Property", (req, res) => {
+//   let sql1 = "UPDATE ";
+//   let sql2 =
+//     "INSERT INTO property (`propertyid`,`ownerid`,`name`, `sleeps`, `bathrooms`, `bedrooms`,`type`,`price`,`location`) VALUES (NULL,?,?,?,?,?,?,?,'san jose')";
+// });
 
-app.post("/Booking", (req, res) => {
-  console.log("Inside booking:", req.body);
+// app.post("/Photos", upload.single("selectedFile"), (req, res) => {
+//   if (!req.file) {
+//     console.log("No file received");
+//     res.send({
+//       success: false
+//     });
+//   } else {
+//     console.log("File received!", res.file);
+//     res.send();
+//   }
+// });
 
-  let startDate = req.body.startdate;
-  let endDate = req.body.enddate;
-  let propertyId = req.body.propertyid;
-  let userId = req.session.userid;
-  console.log("Booking made by User ID:", userId);
-  let sql1 = "SELECT ownerid FROM property WHERE propertyid =?";
-  let sql2 =
-    "INSERT INTO booking (`bookingid`,`propertyid`,`userid`,`ownerid`,`startdate`, `enddate`) VALUES (NULL,?,?,?,?,?)";
-  let sql3 = "UPDATE property SET bookedflag=1 WHERE propertyid=?";
-  pool.query(sql1, [propertyId], (err, result) => {
-    if (err) {
-      throw err;
-    } else {
-      console.log(result[0].ownerid);
-      let OWNERID = result[0].ownerid;
-      pool.query(
-        sql2,
-        [propertyId, userId, OWNERID, startDate, endDate],
-        (err, result1) => {
-          if (err) throw err;
-          else {
-            console.log("Booking Successful", result1);
-            pool.query(sql3, [propertyId], (err, result2) => {
-              if (err) throw err;
-              else {
-                res.end("Bookng Successful");
-              }
-            });
-          }
-        }
-      );
-    }
-  });
-});
+// app.post("/Booking", (req, res) => {
+//   console.log("Inside booking:", req.body);
+
+//   let startDate = req.body.startdate;
+//   let endDate = req.body.enddate;
+//   let propertyId = req.body.propertyid;
+//   let userId = req.session.userid;
+//   console.log("Booking made by User ID:", userId);
+//   let sql1 = "SELECT ownerid FROM property WHERE propertyid =?";
+//   let sql2 =
+//     "INSERT INTO booking (`bookingid`,`propertyid`,`userid`,`ownerid`,`startdate`, `enddate`) VALUES (NULL,?,?,?,?,?)";
+//   let sql3 = "UPDATE property SET bookedflag=1 WHERE propertyid=?";
+//   pool.query(sql1, [propertyId], (err, result) => {
+//     if (err) {
+//       throw err;
+//     } else {
+//       console.log(result[0].ownerid);
+//       let OWNERID = result[0].ownerid;
+//       pool.query(
+//         sql2,
+//         [propertyId, userId, OWNERID, startDate, endDate],
+//         (err, result1) => {
+//           if (err) throw err;
+//           else {
+//             console.log("Booking Successful", result1);
+//             pool.query(sql3, [propertyId], (err, result2) => {
+//               if (err) throw err;
+//               else {
+//                 res.end("Bookng Successful");
+//               }
+//             });
+//           }
+//         }
+//       );
+//     }
+//   });
+// });
 
 //start your server on port 3001
 app.use(serveStatic(path.join(__dirname, "images")));
