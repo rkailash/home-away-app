@@ -4,7 +4,7 @@ import { Route, Redirect, Switch } from "react-router-dom";
 import Header from "./Header";
 import Home from "./Home";
 import Property from "./Property";
-import Login from "./TravelerLogin";
+import Login from "./containers/LoginContainer";
 import OwnerLogin from "./OwnerLogin";
 import Owner from "./Owner";
 import Listing from "./Listing";
@@ -60,7 +60,9 @@ class App extends Component {
           <Route path="/Owner" component={Owner} />
           <Route
             path="/Listing"
-            render={props => <Listing {...props} userInfo={userInfo} query={searchQuery} />}
+            render={props => (
+              <Listing {...props} userInfo={userInfo} query={searchQuery} />
+            )}
           />
           <Route
             path="/Property"

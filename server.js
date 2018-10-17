@@ -97,6 +97,10 @@ app.post("/Login", (req, res) => {
           });
           res.end(JSON.stringify(result[0]));
         } else {
+          res.writeHead(200, {
+            "Content-Type": "text/plain"
+          });
+          res.end("Login unsuccesful");
           console.log("Passwords don't match");
         }
       });

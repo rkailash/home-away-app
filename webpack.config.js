@@ -8,7 +8,10 @@ module.exports = {
   resolve: {
     alias: {
       styles: path.resolve(__dirname, "src/styles/"),
-      templates: path.resolve(__dirname, "src/templates/")
+      templates: path.resolve(__dirname, "src/templates/"),
+      actions: path.resolve(__dirname, "src/actions/"),
+      containers: path.resolve(__dirname, "src/containers/"),
+      reducers: path.resolve(__dirname, "src/reducers/")
     }
   },
   output: {

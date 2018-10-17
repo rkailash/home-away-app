@@ -8,56 +8,27 @@ import "styles/login.scss";
 
 class Login extends Component {
   state = {
-    account: { email: "", password: "" },
-    authFlag: false,
     signUpFlag: false,
-    showEmailError: false,
-    showLoginError: true
+    showEmailError: false
   };
   validateEmail = email => {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
   };
   handleChange = e => {
-    const account = { ...this.state.account };
-    account[e.currentTarget.name] = e.currentTarget.value;
-    this.setState({ account });
+    this.props.handleChange(e);
   };
 
-  handleSubmit = e => {
-    e.preventDefault();
-
-    console.log("Inside handlesubmit method");
-
-    const data = { ...this.state.account };
-    if (this.validateEmail(data.email)) {
-      console.log("Data", data);
-      axios.defaults.withCredentials = true;
-      axios.post("http://localhost:3001/Login", data).then(response => {
-        console.log("Axios POST response:", response.status);
-
-        if (response.status === 200) {
-          this.setState({ authFlag: true });
-          this.props.setUserInfo(response.data);
-        } else {
-          console.log("Login unsuccessful!");
-          this.setState({ authFlag: false, showLoginError: true });
-        }
-      });
-    } else {
-      this.setState({ showEmailError: true });
-    }
-  };
-
+  handleSubmit = () => this.props.handleSubmit(this.props.account);
   handleSignUp = e => {
     e.preventDefault();
     this.setState({ signUpFlag: true });
   };
   render() {
-    const { account, userInfo, showEmailError } = this.state;
-    const { title } = this.props;
+    const { userInfo, showEmailError } = this.state;
+    const { title, account, authFlag, showLoginError } = this.props;
     if (this.state.signUpFlag) return <Redirect to="/Register" />;
-    if (this.state.authFlag && cookie.load("user_cookie")) {
+    if (authFlag && cookie.load("user_cookie")) {
       return <Redirect to="/" />;
     } else {
       return (
@@ -110,7 +81,7 @@ class Login extends Component {
             >
               Log in
             </button>
-            {this.state.showLoginError && (
+            {showLoginError && (
               <small className="my-error">
                 Email or password is incorrect.
               </small>
