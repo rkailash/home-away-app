@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
 import cookie from "react-cookies";
 import Header from "./Header";
-import { Popover, PopoverHeader, PopoverBody } from 'reactstrap';
+import { Popover, PopoverHeader, PopoverBody } from "reactstrap";
 import axios from "axios";
 import "styles/ownerLogin.scss";
 
@@ -17,7 +17,7 @@ class OwnerLogin extends Component {
   validateEmail = email => {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
-  }
+  };
   handleSignUp = e => {
     e.preventDefault();
     this.setState({ signUpFlag: true });
@@ -59,14 +59,16 @@ class OwnerLogin extends Component {
   */
     if (this.state.signUpFlag === true) return <Redirect to="/Register" />;
     else if (this.state.authFlag === true && cookie.load("user_cookie")) {
-      return <Redirect to={{
-        pathname: "/",
-        state: {
-          referrer: {
-
-          }
-        }
-      }} />;
+      return (
+        <Redirect
+          to={{
+            pathname: "/",
+            state: {
+              referrer: {}
+            }
+          }}
+        />
+      );
     } else {
       return (
         <div className="owner-login">
@@ -97,7 +99,11 @@ class OwnerLogin extends Component {
                     onFocus={() => this.setState({ showEmailError: false })}
                     id="Popover3"
                   />
-                  <Popover placement="right" isOpen={this.state.showEmailError} target="Popover3">
+                  <Popover
+                    placement="right"
+                    isOpen={this.state.showEmailError}
+                    target="Popover3"
+                  >
                     <PopoverHeader>Error</PopoverHeader>
                     <PopoverBody>Invalid email address.</PopoverBody>
                   </Popover>
@@ -118,7 +124,11 @@ class OwnerLogin extends Component {
                 >
                   Log in
                 </button>
-                {showLoginError && <small className="my-error">Email or password is incorrect.</small>}
+                {showLoginError && (
+                  <small className="my-error">
+                    Email or password is incorrect.
+                  </small>
+                )}
               </form>
             </div>
           </div>

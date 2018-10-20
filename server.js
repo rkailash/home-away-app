@@ -16,9 +16,35 @@ mongoose.Promise = global.Promise;
 let db = mongoose.connection;
 //Bind connection to error event to get notified for connection errors
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
-const UserModel = require("./models/User");
-app.set("view engine", "ejs");
 
+//Models
+const UserModel = require("./models/User");
+const PropModel = require("./models/Property");
+
+let owner = new UserModel({
+  _id: new mongoose.Types.ObjectId(),
+  email: "kailash@kailash.com",
+  password: "admin"
+});
+owner.save(err => {
+  console.log(err);
+});
+let doc = new PropModel({
+  _id: new mongoose.Types.ObjectId(),
+  name: "Greate place to live",
+  owner: owner._id,
+  sleeps: 5,
+  bathrooms: 3,
+  bedrooms: 3,
+  type: "Cottage",
+  price: 350,
+  location: "San Jose"
+});
+doc.save(err => {
+  console.log(err);
+});
+
+app.set("view engine", "ejs");
 app.use(
   session({
     secret: "cmpe273_kafka_passport_mongo",
@@ -81,7 +107,7 @@ app.post("/Login", (req, res) => {
       if (user && user.password == req.body.password) {
         res.code = "200";
         res.value = user;
-        res.cookie("cookie", "admin", {
+        res.cookie("user_cookie", "admin", {
           maxAge: 900000,
           httpOnly: false,
           path: "/"
@@ -188,25 +214,21 @@ app.post("/Register", (request, response) => {
 //   });
 // });
 
-// app.get("/Home", (req, res) => {
-//   console.log(req.query);
-//   let location = req.query.location;
-//   let sql = "SELECT * FROM `property` WHERE `location` = san jose";
-//   pool.query(sql, location, (err, result) => {
-//     if (err) {
-//       throw err;
-//       res.writeHead(400, {
-//         "Content-Type": "text/plain"
-//       });
-//       res.end("No search results returned");
-//     } else {
-//       res.writeHead(200, {
-//         "Content-Type": "application/json"
-//       });
-//       res.end(JSON.stringify(result));
-//     }
-//   });
-// });
+app.get("/Home", (req, res) => {
+  console.log(req.query);
+
+  PropModel.find({ location: req.query.location })
+
+    .then(properties => {
+      res.code = "200";
+      res.send({ properties });
+    })
+
+    .catch(error => {
+      res.code = "400";
+      res.send = error;
+    });
+});
 
 // app.get("/PropertyList", (req, res) => {
 //   console.log("Inside Property Results Page");
